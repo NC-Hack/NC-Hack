@@ -1,0 +1,332 @@
+<%- include('components/header') %>
+<% let isMod = user ? ["admin", "organizer"].some(f => Object.keys(user.flags).filter(k => user.flags[k]).includes(f)) : false;
+if (isMod) {%>
+    <div class="modal fade" id="challengeEditModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Challenge</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/challenge/<%= challenge._id %>" method="post" id="form">
+                        <input name="_method" value="put" hidden/>
+                        <p id="edit" hidden></p>
+                        <div class="modal-body">
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control" type="text" name="title" id="form-c-title" value="<%= challenge.title %>"/>
+                                    <span class="label">Title</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-c-title-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control" type="text" name="short" id="form-short"><%= challenge.short %></textarea>
+                                    <span class="label">Short Description</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-short-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control" type="text" name="long" id="form-long"><%= challenge.long %></textarea>
+                                    <span class="label">Long Description (supports Markdown)</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-long-help" hidden="true"></p>
+                            <div class="card" id="md-preview-card" hidden>
+                                <div class="card-body">
+                                    <h5 class="card-title">Markdown preview</h5>
+                                    <hr>
+                                    <p class="card-text" id="md-preview"><%= challenge.long %></p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control" type="text" name="sponsor" id="form-sponsor" value="<%= challenge.sponsor.name %>"/>
+                                    <span class="label">Sponsor (not required)</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-sponsor-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control" type="text" name="sponsorlink" id="form-sponsorlink" value="<%= challenge.sponsor.link %>"/>
+                                    <span class="label">Sponsor Link (not required)</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-sponsorlink-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control dformconvert" type="datetime-local" name="start" id="form-c-start" data-date="<%= new Date(challenge.start).toUTCString(); %>"/>
+                                    <span class="label">Start Date</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-c-start-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control dformconvert" type="datetime-local" name="end" id="form-c-end" data-date="<%= new Date(challenge.end).toUTCString(); %>"/>
+                                    <span class="label">End Date</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-c-end-help" hidden="true"></p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="form-hidden" value="true" <%= challenge.hidden ? "checked" : "" %>>
+                                <label class="form-check-label" for="form-hidden">
+                                    Hidden
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary modal-btn" id="ui-create-btn" disabled>Edit challenge</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="challengeDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Challenge</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/challenge/<%= challenge._id %>" method="post" id="form">
+                        <input name="_method" value="delete" hidden/>
+                        <button type="submit" class="btn btn-danger modal-btn" id="ui-form-delete-btn">Delete challenge</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } if (!preSub && user && user.flags.participant && Date.now() >= challenge.start && Date.now() < challenge.end) { %>
+        <div class="modal fade" id="enterChallengeModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Enter Challenge: <%= challenge.title %></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <% if (user.github && repos.length > 0) { %>
+                        <form action="/challenge/<%= challenge._id %>/enter" method="post" id="form">
+                            <div class="modal-body">
+                                <div class="form-group field">
+                                    <div>
+                                        <select class="custom-select" name="repo" id="form-entry-link">
+                                            <option selected disabled>Select a respository...</option>
+                                            <% repos.forEach(r => {%>
+                                                <option value="<%= r.full_name %>"><%= r.full_name %></option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <p>These are sourced from your public repositories. If you're working in a team and didn't create the repository, have the member who did submit your entry.</p>
+                                <p class="help errorMsg" id="form-entry-link-help" hidden="true"></p>
+
+                                <div class="form-group input-group field">
+                                    <label class="has-float-label">
+                                        <textarea class="form-control" type="text" name="desc" id="form-entry-desc" placeholder="Describe your entry! (minimum of 300 characters)" style="height:300px;"></textarea>
+                                        <span class="label">Description</span>
+                                    </label>
+                                </div>
+                                <p class="help errorMsg" id="form-entry-desc-help" hidden="true"></p>
+
+                                <p class="text-danger">You may only submit one entry, and it cannot be edited.<br><% if (user.team) { %>Since you are a member of a team, this entry will count as the entry for your whole team.<% } %></p>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary modal-btn" id="ui-submit-btn" disabled>Submit entry</button>
+                            </div>
+                        </form>
+                        <% } else { %>
+                            <div class="modal-body">
+                                <p>You must have a connected <a href="/github">GitHub</a> account and at least one <strong>public</strong> repository to enter challenges.</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+<div class="m-3">
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+        <div style="width:auto;text-align:left;">
+            <h1><%= challenge.title %></h1>
+            <p><% if (challenge.sponsor.name) { %>
+            Sponsored by <a target="_blank" href="<%= challenge.sponsor.link %>"><%= challenge.sponsor.name %></a><br>
+            <% } %>
+            Runs <span class="created"><%= challenge.start %></span> to <span class="created"><%= challenge.end %></span><br><%= challenge.short %></p>
+            <%
+                if (isMod && challenge.hidden) {
+                    %>
+            <p class="p-3 mb-2 bg-danger text-white"><i class="material-icons material-icons-va-off" >visibility_off</i> This challenge is hidden and only viewable by staff members</p>
+            <%
+                }
+                if (isMod && challenge.judges.length === 0) {
+            %>
+                <p class="p-3 mb-2 bg-warning text-white" style="width:auto;"><i class="material-icons material-icons-va-off" >announcement</i> This challenge has no judges</p>
+            <%
+                }
+            const translation = {
+                "admin": {
+                    icon: "admin_panel_settings",
+                    color: "blue",
+                    tooltip: "Website Administrator"
+                },
+                "organizer": {
+                    icon: "beenhere",
+                    color: "gold",
+                    tooltip: "Organizer"
+                },
+                "judge": {
+                    icon: "gavel",
+                    color: "green",
+                    tooltip: "Judge"
+                },
+                "sponsor": {
+                    icon: "monetization_on",
+                    color: "darkgreen",
+                    tooltip: "Sponsor"
+                },
+                "mentor": {
+                    icon: "help",
+                    color: "#59dbbb",
+                    tooltip: "Mentor"
+                },
+                "host": {
+                    icon: "videocam",
+                    color: "lightblue",
+                    tooltip: "Talk Host"
+                },
+                "winner": {
+                    icon: "emoji_events",
+                    color: "gold",
+                    tooltip: "Winner"
+                },
+                "team": {
+                    icon: "group",
+                    color: "pink",
+                    tooltip: "Team User"
+                },
+                "no_email": {
+                    icon: "no_cell",
+                    color: "red",
+                    tooltip: "Email Not Verified",
+                    hidden: true
+                },
+                "no_edit": {
+                    icon: "blur_off",
+                    color: "red",
+                    tooltip: "Cannot Edit challenge.creator",
+                    hidden: true
+                },
+                "suspended": {
+                    icon: "block",
+                    color: "red",
+                    tooltip: "Suspended",
+                    hidden: true
+                },
+                "verified": {
+                    icon: "verified",
+                    color: "#4ba8fa",
+                    tooltip: "Verified"
+                }
+            }
+
+            let badges = "";
+            if (challenge.creator) {
+                const badgeList = Object.keys(challenge.creator.flags).filter(k => translation[k] && challenge.creator.flags[k] && !translation[k].hidden);
+                badges = badgeList.map(k => `<i class="material-icons material-icons-va-off" style="color:${translation[k].color};cursor:pointer;" data-toggle="tooltip" data-placement="top" title="${translation[k].tooltip}">${translation[k].icon}</i>`).join(" ");
+            }
+            %>
+            <hr>
+            <p style="white-space: pre-wrap;" class="announcement-text"><%= challenge.long %></p>
+            <hr>
+            <% if (challenge.creator) { %>
+            <img src="<%= (challenge.creator ? challenge.creator.avatar : null) || "/images/default.png" %>" style="width: 30px; height: 30px; object-fit: cover;vertical-align:top;margin-top:0 !important;margin-right:1px !important;margin-bottom:0 !important" class="rounded-circle m-2 d-inline">
+            <p class="subtitle is-6 m-2 d-inline" style="margin-top:25px;">Posted by <%- challenge.creator ? `<a href="https://nchack.org/profile/${challenge.creator.username}">${challenge.creator.name}</a>` : "a moderator" %> <%- badges %></p>
+            <% } %>
+            <% if (isMod || (user && challenge.judges.includes(user._id)) || (!preSub && user && user.flags.participant && Date.now() >= challenge.start && Date.now() < challenge.end)) { if (challenge.creator) { %> <br><br><% } if (isMod) {%><a data-toggle="modal" class="btn btn-primary" style="color:white;"  data-target="#challengeEditModal">Edit</a> <a data-toggle="modal" style="color:white;" class="btn btn-danger"  data-target="#challengeDeleteModal">Delete</a><% } if (user && (isMod || challenge.judges.includes(user._id))) { %> <a style="color:white;" class="btn btn-info" href="/challenge/<%= challenge._id %>/judging">Judging Panel</a> <%}if (!preSub && user && user.flags.participant && !challenge.judges.includes(user._id) && Date.now() >= challenge.start && Date.now() < challenge.end) { %> <a data-toggle="modal" style="color:white;" class="btn btn-primary"  data-target="#enterChallengeModal">Submit an entry</a><% } } %>
+            <% if (preSub) {
+                %>
+                <hr><p class="break-word"><%= user.team ? "Your team has" : "You have" %> already submitted an entry to this challenge. (<a href="https://github.com/<%= preSub.github %>">https://github.com/<%= preSub.github %></a>)</p>
+            <%
+            } %>
+            <% if ((challenge.resultsPublished || isMod) && challenge.criteria.length > 0) {
+                let topScore = challenge.criteria.map(j => j.worth).reduce((p, n) => p + n);
+                %>
+            <hr>
+            <h3><%= !challenge.resultsPublished ? "Preliminary " : ""%>Results</h3>
+            <table class="table table-striped">
+                <thead class="thead-light">
+                <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col">Link</th>
+                    <th scope="col">Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <%
+                    function pct (s) {
+                        let score = s.judging.length !== challenge.criteria.length ? 0 : s.judging.map(j => j.score).reduce((p, n) => p + n);
+                        return score/topScore;
+                    }
+                    let rank = 1;
+                submissions.filter(s => !s.disqualified).sort((a, b) => pct(b) - pct(a)).forEach(s => {
+                %>
+                <tr>
+                    <td><%= rank %><%- rank <= 3 ? " <i class=\"material-icons material-icons-va-off\" style=\"color:gold;cursor:pointer;\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Winning Entry\">emoji_events</i>" : ""%></td>
+                    <td><a href="https://github.com/<%= s.github %>"><%= s.github %></a></td>
+                    <td><%= s.judging.length === challenge.criteria.length ? s.judging.map(j => j.score).reduce((p, n) => p + n) : "Not Judged"%>/<%= topScore %>
+                    </td>
+                </tr>
+                <%
+                    rank++;
+                })
+                %>
+                </tbody>
+            </table>
+            <%
+            }%>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/js/challenge.validator.js"></script>
+<script type="text/javascript" src="/js/entry.validator.js"></script>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+    for (let t of document.getElementsByClassName("announcement-text")) {
+        t.innerHTML = (new showdown.Converter()).makeHtml(t.innerHTML)
+    }
+    for (let t of document.getElementsByClassName("created")) {
+        t.innerHTML = `${new Date(t.innerHTML).toLocaleString()}`;
+    }
+    for (let t of document.getElementsByClassName("dformconvert")) {
+        console.log(t)
+        let d = new Date(t.dataset.date);
+        console.log(d);
+        t.value = `${d.getFullYear()}-${("0" + (d.getMonth()+1)).slice(-2)}-${("0" + d.getDate()).slice(-2)}T${("0" + d.getHours()).slice(-2)}:${("0" + d.getMinutes()).slice(-2)}`;
+    }
+</script>
+<% if (isMod) {%>
+    <script>
+        let mdp = document.getElementById("md-preview");
+    mdp.innerHTML = (new showdown.Converter()).makeHtml(mdp.innerHTML);
+    document.getElementById("md-preview-card").hidden = false;
+    </script>
+<%}%>
+
+<%- include('components/footer') %>

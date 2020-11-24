@@ -1,0 +1,160 @@
+.navbar-expand-lg.scrolled {
+    /*background-color: rgb(34, 31, 31) !important;*/
+            /* Add the blur effect */
+            filter: blur(8px);
+            -webkit-filter: blur(8px);
+    transition: background-color 200ms linear;
+  }
+.front {
+    overflow: hidden;
+}
+
+img:hover {
+  box-shadow: 0 0 11px rgba(33,33,33,.2);
+}
+
+.img {
+    max-width: 100%;
+}
+
+.indent-1 {
+    float: left;
+}
+.indent-1 section {
+    width: 100%; float: left;
+}
+
+.center {
+    overflow: hidden;
+        margin-right: auto !important;
+        margin-left: auto !important;
+        width: 100%;
+}
+
+.masthead {
+    height: 50vh;
+    min-height: 500px;
+    background-image: url('/images/hackathon.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .description1 {
+    height: 50vh;
+    /*min-height: 50px;*/
+    width: 40em;
+    background-image: url('/images/hack1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: inline-block;
+    margin: 0 auto;
+  }
+
+  body {
+    font-family: bilo, sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .left-10 {
+    padding-left: 10px;
+  }
+  .left-5 {
+    padding-left: 5px;
+  }
+
+  .account {
+    margin-left: 2px;
+    margin-bottom: 1px;
+  }
+
+  .errorBox, .errorBox label input:focus, .errorBox label textarea:focus {
+      border: 2px #ac1f20 solid;
+      border-radius: 5px;
+      margin-bottom: 0;
+  }
+
+  .successBox, .successBox label input:focus, .successBox label textarea:focus {
+      border: 2px #108b38 solid;
+      border-radius: 5px;
+  }
+
+  .errorMsg {
+      margin-top: 0;
+      background-color: #f0b5c1;
+      padding-left: 5px;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      margin-left: 5px;
+      margin-right: 5px;
+  }
+
+  .has-float-label span {
+      background-color: white;
+  }
+
+[contenteditable="true"]:focus {
+    outline: none;
+}
+
+.lower {
+    text-transform: lowercase;
+}
+
+.moderation-actions-menu a:active {
+    background: #cbcbcb;
+}
+
+.modal-btn:disabled {
+    cursor: default;
+}
+
+.link-white {
+    color:white;
+}
+.link-white:active, .link-white:hover {
+    color: #d6d6d6;
+}
+
+.dropdown-item {
+    white-space: normal !important;
+}
+
+.material-icons {
+    vertical-align: bottom;
+}
+
+.material-icons-va-off {
+    vertical-align: text-top !important;
+}
+
+
+.footer {
+    background-color: rgb(29, 238, 221);
+}
+
+.linkfix:hover {
+    text-decoration: underline !important;
+    cursor: pointer;
+}
+
+.break-word {
+    word-wrap: break-word;
+}
+
+.criteria-input {
+    /*border: 1px solid gray;
+    border-radius: 15px;*/
+    padding: 10px;
+    width: auto;
+    margin-bottom: 5px;
+}
+
+.criteria-input input {
+    outline: gray inset 1px;
+    border-radius: 10px;
+    width: 60%;
+    margin-bottom: 5px;
+}

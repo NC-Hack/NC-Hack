@@ -1,0 +1,205 @@
+<%- include('components/header') %>
+
+<!-- Modal -->
+<% let isMod = user ? ["admin", "organizer"].some(f => Object.keys(user.flags).filter(k => user.flags[k]).includes(f)) : false;
+if(isMod) { %>
+    <div class="modal fade" id="announcementModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Publish Announcement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/api/announce" method="post" id="form">
+                        <div class="modal-body">
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control announce-type" type="text" name="announcement" id="form-announcement"></textarea>
+                                    <span class="label">Announcement Content</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-announcement-help" hidden="true"></p>
+                            <div class="card" id="md-preview-card-form-announcement" hidden>
+                                <div class="card-body">
+                                    <h5 class="card-title">Markdown preview</h5>
+                                    <hr>
+                                    <p class="card-text" id="md-preview-form-announcement"></p>
+                                </div>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="form-anonymous" value="true">
+                                <label class="form-check-label" for="form-anonymous">
+                                    Anonymous
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary modal-btn" id="ui-form-announcement-btn" disabled>Publish announcement</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% announcements.sort((a, b) => b.created - a.created).forEach(message => {%>
+        <div class="modal fade" id="announcementEditModal<%= message._id %>" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Announcement</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/message/<%= message._id %>" method="post" id="form">
+                            <input name="_method" value="put" hidden/>
+                            <div class="modal-body">
+                                <div class="form-group input-group field">
+                                    <label class="has-float-label">
+                                        <textarea class="form-control announce-type" type="text" name="reason" id="form-edit-<%= message._id %>"><%= message.reason %></textarea>
+                                        <span class="label">Announcement Content</span>
+                                    </label>
+                                </div>
+                                <p class="help errorMsg" id="form-edit-<%= message._id %>-help" hidden="true"></p>
+                                <div class="card" id="md-preview-card-form-edit-<%= message._id %>">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Markdown preview</h5>
+                                        <hr>
+                                        <p class="card-text" id="md-preview-form-edit-<%= message._id %>"><%= message.reason %></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary modal-btn" id="ui-form-edit-<%= message._id %>-btn" disabled>Edit announcement</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="announcementDeleteModal<%= message._id %>" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Announcement</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/message/<%= message._id %>" method="post" id="form">
+                            <input name="_method" value="delete" hidden/>
+                            <button type="submit" class="btn btn-danger modal-btn" id="ui-form-delete-<%= message._id %>-btn">Delete announcement</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+<% } %>
+<% if (isMod) { %><br><br><a class="btn btn-primary m-2" style="color:white;margin: 0 auto !important;display:block !important;width: 30%;" data-toggle="modal" data-target="#announcementModal">Create Announcement</a><% } %>
+<div class="container m-3 mx-auto">
+    <br><br>
+        <% announcements.sort((a, b) => b.created - a.created).forEach(message => {%>
+        <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+            <div style="width:auto;text-align:left;">
+                <img src="<%= (message.mod ? message.mod.avatar : null) || "/images/default.png" %>" style="width: 30px; height: 30px; object-fit: cover;vertical-align:top;margin-top:0 !important;margin-right:1px !important;margin-bottom:0 !important" class="rounded-circle m-2 d-inline">
+                <%
+                    const translation = {
+                        "admin": {
+                            icon: "admin_panel_settings",
+                            color: "blue",
+                            tooltip: "Website Administrator"
+                        },
+                        "organizer": {
+                            icon: "beenhere",
+                            color: "gold",
+                            tooltip: "Organizer"
+                        },
+                        "judge": {
+                            icon: "gavel",
+                            color: "green",
+                            tooltip: "Judge"
+                        },
+                        "sponsor": {
+                            icon: "monetization_on",
+                            color: "darkgreen",
+                            tooltip: "Sponsor"
+                        },
+                        "mentor": {
+                            icon: "help",
+                            color: "#59dbbb",
+                            tooltip: "Mentor"
+                        },
+                        "host": {
+                            icon: "videocam",
+                            color: "lightblue",
+                            tooltip: "Talk Host"
+                        },
+                        "winner": {
+                            icon: "emoji_events",
+                            color: "gold",
+                            tooltip: "Winner"
+                        },
+                        "team": {
+                            icon: "group",
+                            color: "pink",
+                            tooltip: "Team User"
+                        },
+                        "no_email": {
+                            icon: "no_cell",
+                            color: "red",
+                            tooltip: "Email Not Verified",
+                            hidden: true
+                        },
+                        "no_edit": {
+                            icon: "blur_off",
+                            color: "red",
+                            tooltip: "Cannot Edit message.mod",
+                            hidden: true
+                        },
+                        "suspended": {
+                            icon: "block",
+                            color: "red",
+                            tooltip: "Suspended",
+                            hidden: true
+                        },
+                        "verified": {
+                            icon: "verified",
+                            color: "#4ba8fa",
+                            tooltip: "Verified"
+                        }
+                    }
+
+                    let badges = "";
+                    if (message.mod) {
+                        const badgeList = Object.keys(message.mod.flags).filter(k => translation[k] && message.mod.flags[k] && !translation[k].hidden);
+                        badges = badgeList.map(k => `<i class="material-icons material-icons-va-off" style="color:${translation[k].color};cursor:pointer;" data-toggle="tooltip" data-placement="top" title="${translation[k].tooltip}">${translation[k].icon}</i>`).join(" ");
+                    }
+                %>
+                <p class="subtitle is-6 m-2 d-inline" style="margin-top:25px;"><%- message.mod ? `<a href="https://nchack.org/profile/${message.mod.username}">${message.mod.name}</a>` : "NC Hack Team" %> <%- badges %> <span class="created" style="color:gray"><%= message.created %></span></p>
+                <hr>
+                <p style="white-space: pre-wrap;" class="announcement-text"><%= message.reason %></p>
+                <% if (isMod) { %> <hr><a data-toggle="modal" class="btn btn-primary" style="color:white;"  data-target="#announcementEditModal<%= message._id %>">Edit</a> <a data-toggle="modal" style="color:white;" class="btn btn-danger"  data-target="#announcementDeleteModal<%= message._id %>">Delete</a> <% } %>
+            </div>
+        </div>
+        <br>
+    <% }) %>
+
+</div>
+<hr>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<script type="text/javascript" src="/js/announcement.validator.js"></script>
+
+<%- include('components/footer') %>

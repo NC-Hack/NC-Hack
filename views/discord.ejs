@@ -1,0 +1,31 @@
+<%- include('components/header') %>
+
+<!-- Modal -->
+<div class="m-3">
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+        <% if (error) {
+            %>
+            <p class="help errorMsg announcement-text" style="border-radius: 5px;white-space: pre-wrap;">There was an error connecting to Discord</p>
+        <%
+        } if (authErr) {%>
+                <p class="help errorMsg announcement-text" style="border-radius: 5px;white-space: pre-wrap;"><%= authErr %></p>
+            <% } %>
+            <img src="/images/connectdiscord.png">
+        <h1>Connect Discord</h1>
+            <br>
+            <% if (discordInfo.name && !authErr) {
+            %>
+                <img src="<%= discordInfo.avatar %>" style="width: 30px; height: 30px; object-fit: cover;vertical-align:top;margin-top:0 !important;margin-right:1px !important;margin-bottom:0 !important;" class="rounded-circle m-2 d-inline">
+                <p class="subtitle is-6 m-2 d-inline" style="word-wrap: break-word;margin-top:25px;">Your Discord account is <%= discordInfo.name%><br><a href="https://discord.gg/AdKaG7F">NC Hack Discord Server</a></p><br>
+                <br>
+                <form action="/api/discord/disconnect" method="post" id="form">
+                    <button type="submit" class="btn btn-danger" id="join-btn"><i class="material-icons">exit_to_app</i> Disconnect Discord</button>
+                </form>
+            <% } else {%>
+                <p>Upon authorizing, you will be added to the <a href="https://discord.gg/AdKaG7F">NC Hack Discord server</a> and have your account connected to Discord!</p>
+                <a class="btn btn-primary" href="<%= process.env.DISCORD_AUTH_URL %>"><i class="material-icons">link</i> Connect Discord</a>
+        <% } %>
+    </div>
+</div>
+
+<%- include('components/footer') %>

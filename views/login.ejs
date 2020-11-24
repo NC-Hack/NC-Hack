@@ -1,0 +1,57 @@
+<%- include('components/header') %>
+
+<div class="mx-auto">
+    <div class=" is-1 level flat mx-auto">
+    </div>
+    <br>
+    <div class="shadow mx-auto rounded p-4" style="width: 500px;">
+        <h3 class="text-center">Welcome back!</h3>
+        <hr>
+        <div>
+            <form action="/api/login" method="post" id="form">
+                <div class="container">
+                    <div class="mx-auto">
+                        <% if (message.length > 0) {
+                        if (typeof message !== "string") {%>
+                            <p class="help errorMsg announcement-text" style="border-radius: 5px;white-space: pre-wrap;"><%- message[0] %><%= message[1] %></p>
+                        <% } else { %> <p class="help errorMsg" style="border-radius: 5px;white-space: pre-wrap;"><%= message %></p> <% } %>
+                        <% } %>
+                        <div class="form-group input-group field">
+                            <label class="has-float-label">
+                                <input class="form-control lower" type="text" name="username" id="form-username" placeholder=" "/>
+                                <span class="label">Username or Email</span>
+                            </label>
+                        </div>
+                        <p class="help errorMsg" id="form-username-help" hidden="true"></p>
+                        <div class="form-group input-group">
+                            <label class="has-float-label field">
+                                <input class="form-control" type="password" name="password" placeholder=" " id="form-password"/>
+                                <span class="label">Password</span>
+                            </label>
+                        </div>
+                        <p class="help errorMsg" id="form-password-help" hidden="true"></p>
+                    </div>
+                    <br>
+                    <div class="row justify-between">
+                        <div class="col">
+                            <input id="submit-button" value="Login" type="submit" class="btn btn-primary" disabled/>
+                        </div>
+                        <div class="col">
+                            <a href="/forgot">Forgot Password?</a><br>
+                            Don't have an account? <a href="/signup">Sign Up</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="column is-1 level">
+    </div>
+</div>
+<script type="text/javascript" src="js/login.validator.js"></script>
+<script>
+    for (let t of document.getElementsByClassName("announcement-text")) {
+        t.innerHTML = (new showdown.Converter()).makeHtml(t.innerHTML)
+    }
+</script>
+<%- include('components/footer') %>

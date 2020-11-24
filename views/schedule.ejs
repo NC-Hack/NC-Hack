@@ -1,0 +1,326 @@
+<%- include('components/header') %>
+
+<!-- Modal -->
+<% let isMod = user ? ["admin", "organizer"].some(f => Object.keys(user.flags).filter(k => user.flags[k]).includes(f)) : false;
+let sortedEvents = _.groupBy(events, function (el) {
+    return (el.start.getFullYear() + '|y|') + (el.start.getMonth() + '|m|') + (el.start.getDate() + '|d|');
+});//.sort((a, b) => )
+function matchDate(d) {
+    let match = d.match(/(\d{4})\|y\|(\d{1,2})\|m\|(\d{1,2})\|d\|/);
+    if (!match) return null;
+    return new Date(match[1], match[2], match[3]);
+}
+let eventsInOrder = Object.keys(sortedEvents).sort((a, b) => matchDate(b) - matchDate(a)).reverse();
+if(isMod) { %>
+    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Scheduled Event</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/api/event" method="post" id="new" class="event-form">
+                        <div class="modal-body">
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control form-validate-title" type="text" name="title" id="form-new-title"/>
+                                    <span class="label">Title</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-new-title-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control form-validate-desc" type="text" name="description" id="form-new-desc"></textarea>
+                                    <span class="label">Description (supports Markdown)</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-new-desc-help" hidden="true"></p>
+                            <div class="card" id="md-preview-card-new" hidden>
+                                <div class="card-body">
+                                    <h5 class="card-title">Markdown preview</h5>
+                                    <hr>
+                                    <p class="card-text" id="md-preview-new"></p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control form-validate-start" type="datetime-local" name="start" id="form-new-start"/>
+                                    <span class="label">Start Date</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-new-start-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control form-validate-end" type="datetime-local" name="end" id="form-new-end"/>
+                                    <span class="label">End Date</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-new-end-help" hidden="true"></p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="form-anonymous" value="true">
+                                <label class="form-check-label" for="form-anonymous">
+                                    Anonymous
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary modal-btn" id="ui-form-new-btn" disabled>Publish</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="challengeModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Challenge</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/api/challenge" method="post" id="form">
+                        <div class="modal-body">
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control" type="text" name="title" id="form-c-title"/>
+                                    <span class="label">Title</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-c-title-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control" type="text" name="short" id="form-short"></textarea>
+                                    <span class="label">Short Description</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-short-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control" type="text" name="long" id="form-long"></textarea>
+                                    <span class="label">Long Description (supports Markdown)</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-long-help" hidden="true"></p>
+                            <div class="card" id="md-preview-c-card" hidden>
+                                <div class="card-body">
+                                    <h5 class="card-title">Markdown preview</h5>
+                                    <hr>
+                                    <p class="card-text" id="md-preview-c"></p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control" type="text" name="sponsor" id="form-sponsor"/>
+                                    <span class="label">Sponsor (not required)</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-sponsor-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control" type="text" name="sponsorlink" id="form-sponsorlink"/>
+                                    <span class="label">Sponsor Link (not required)</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-sponsorlink-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control" type="datetime-local" name="start" id="form-c-start"/>
+                                    <span class="label">Start Date</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-c-start-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control" type="datetime-local" name="end" id="form-c-end"/>
+                                    <span class="label">End Date</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-c-end-help" hidden="true"></p>
+
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="form-anonymous" value="true">
+                                <label class="form-check-label" for="form-anonymous">
+                                    Anonymous
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary modal-btn" id="ui-create-btn" disabled>Publish challenge</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% eventsInOrder.forEach(k => {
+        let eventsForEdit = sortedEvents[k].filter(e => !e.judges).sort((a, b) => a.start - b.start);
+    eventsForEdit.forEach(e => {%>
+    <div class="modal fade" id="scheduleEditModal<%= e._id %>" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Event</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/event/<%= e._id %>" method="post" class="event-form" id="<%= e._id %>">
+                        <input name="_method" value="put" hidden/>
+                        <div class="modal-body">
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control form-validate-title" type="text" name="title" id="form-edit-<%= e._id %>-title" value="<%= e.title %>"/>
+                                    <span class="label">Title</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-edit-<%= e._id %>-title-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control form-validate-desc" type="text" name="description" id="form-edit-<%= e._id %>-desc"><%= e.description %></textarea>
+                                    <span class="label">Description (supports Markdown)</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-edit-<%= e._id %>-desc-help" hidden="true"></p>
+                            <div class="card" id="md-preview-card-<%= e._id %>">
+                                <div class="card-body">
+                                    <h5 class="card-title">Markdown preview</h5>
+                                    <hr>
+                                    <p class="card-text announcement-text" id="md-preview-<%= e._id %>"><%= e.description %></p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control form-validate-start dformconvert" type="datetime-local" name="start" id="form-edit-<%= e._id %>-start" data-date="<%= new Date(e.start).toUTCString(); %>"/>
+                                    <span class="label">Start Date</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-edit-<%= e._id %>-start-help" hidden="true"></p>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <input class="form-control form-validate-end dformconvert" type="datetime-local" name="end" id="form-edit-<%= e._id %>-end" data-date="<%= new Date(e.end).toUTCString(); %>"/>
+                                    <span class="label">End Date</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-edit-<%= e._id %>-end-help" hidden="true"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary modal-btn" id="ui-form-<%= e._id %>-btn" disabled>Edit event</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="scheduleDeleteModal<%= e._id %>" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Event</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/event/<%= e._id %>" method="post" id="form">
+                        <input name="_method" value="delete" hidden/>
+                        <button type="submit" class="btn btn-danger modal-btn" id="ui-form-delete-<%= e._id %>-btn">Delete event</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        <% }) })%>
+<% } %>
+<% if (isMod) { %><br><br><a class="btn btn-primary m-2" style="color:white;margin: 0 auto !important;display:block !important;width: 30%;" data-toggle="modal" data-target="#eventModal"><i class="material-icons">event</i> Create Event</a><br><a class="btn btn-primary m-2" style="color:white;margin: 0 auto !important;display:block !important;width: 30%;" data-toggle="modal" data-target="#challengeModal"><i class="material-icons">emoji_events</i> Create Challenge</a><% } %>
+<div class="container m-3 mx-auto">
+    <br><br>
+        <%
+        let inDates = eventsInOrder.filter(k => sortedEvents[k].find(e => new Date(e.start.getTime()) >= Date.now() || new Date(e.end.getTime()) >= Date.now()));
+        let oldDates = eventsInOrder.filter(k => sortedEvents[k].find(e => new Date(e.end.getTime()) < Date.now()));
+        inDates.forEach(k => {
+            let eventsOnDay = sortedEvents[k].filter(e => new Date(e.start.getTime()) >= Date.now() || new Date(e.end.getTime()) >= Date.now()  && (e.hidden ? isMod : true)).sort((a, b) => a.start - b.start);
+            if (eventsOnDay.length > 0) {
+                %>
+        <div class="row row-striped">
+            <div class="col-2 text-right">
+                <h1 class="display-4"><span class="badge badge-secondary"><%= matchDate(k).getDate() %></span></h1>
+                <h2><%= matchDate(k).toLocaleString('default', { month: 'short' }).toUpperCase() %></h2>
+            </div>
+            <div class="col-10">
+                <% eventsOnDay.sort((a, b) => b.start - a.start).forEach(e => { %>
+                <h3 class="text-uppercase"><strong><%= e.title %></strong></h3>
+                <ul class="list-inline">
+                    <% if (Date.now() > new Date(e.start)) { %><li class="list-inline-item"><span style="color:red"><i class="material-icons">priority_high</i> Happening Now!</span> Ends at <span class="created"><%= e.end %></span></li><% } else { %>
+                    <li class="list-inline-item"><i class="material-icons">schedule</i> <span class="created"><%= e.start %></span> - <span class="created"><%= e.end %></span></li>
+                    <% } if (e.judges) { %><li class="list-inline-item"><a href="https://nchack.org/challenge/<%= e._id %>"><i class="material-icons">link</i> Challenge Info</a></li><% } else if (isMod) { %>
+                            <li class="list-inline-item"><a data-toggle="modal" class="text-primary linkfix" style="color:white;"  data-target="#scheduleEditModal<%= e._id %>"><i class="material-icons">create</i> Edit</a></li>
+                            <li class="list-inline-item"><a data-toggle="modal" class="text-danger linkfix" style="color:white;"  data-target="#scheduleDeleteModal<%= e._id %>"><i class="material-icons">delete</i> Delete</a></li><% } %>
+                </ul>
+                <p class="announcement-text"><%= e.short ? e.short : e.description %></p>
+                <% }) %>
+            </div>
+        </div>
+    <br>
+    <%
+    }
+    });
+        if (oldDates.length > 0) { %> <hr><h1 class="text-center">Previous Events</h1><br> <%}
+    oldDates.reverse().forEach(k => {
+        let eventsOnDay = sortedEvents[k].filter(e => new Date(e.end.getTime()) < Date.now() && (e.hidden ? isMod : true)).sort((a, b) => a.start - b.start);
+    if (eventsOnDay.length > 0) {
+    %>
+        <div class="row row-striped">
+            <div class="col-2 text-right">
+                <h1 class="display-4"><span class="badge badge-secondary"><%= matchDate(k).getDate() %></span></h1>
+                <h2><%= matchDate(k).toLocaleString('default', { month: 'short' }).toUpperCase() %></h2>
+            </div>
+            <div class="col-10">
+                <% eventsOnDay.sort((a, b) => b.start - a.start).forEach(e => { %>
+                    <h3 class="text-uppercase"><strong><%= e.title %></strong></h3>
+                    <ul class="list-inline">
+                            <li class="list-inline-item"><i class="material-icons">schedule</i> <span class="created"><%= e.start %></span> - <span class="created"><%= e.end %></span></li>
+                        <% if (e.judges) { %><li class="list-inline-item"><a href="https://nchack.org/challenge/<%= e._id %>"><i class="material-icons">link</i> Challenge Info</a></li><% } else if (isMod) { %>
+                            <li class="list-inline-item"><a data-toggle="modal" class="text-primary linkfix" style="color:white;"  data-target="#scheduleEditModal<%= e._id %>"><i class="material-icons">create</i> Edit</a></li>
+                            <li class="list-inline-item"><a data-toggle="modal" class="text-danger linkfix" style="color:white;"  data-target="#scheduleDeleteModal<%= e._id %>"><i class="material-icons">delete</i> Delete</a></li><% } %>
+                    </ul>
+                    <p class="announcement-text"><%= e.short ? e.short : e.description %></p>
+                <% }) %>
+            </div>
+        </div>
+        <br>
+    <%
+    }
+    }); %>
+
+</div>
+<hr>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+    for (let t of document.getElementsByClassName("created")) {
+        t.innerHTML = `${new Date(t.innerHTML).toLocaleString()}`;
+    }
+    for (let t of document.getElementsByClassName("dformconvert")) {
+        let d = new Date(t.dataset.date);
+        t.value = `${d.getFullYear()}-${("0" + (d.getMonth()+1)).slice(-2)}-${("0" + d.getDate()).slice(-2)}T${("0" + d.getHours()).slice(-2)}:${("0" + d.getMinutes()).slice(-2)}`;
+    }
+</script>
+<script type="text/javascript" src="/js/schedule.validator.js"></script>
+<script type="text/javascript" src="/js/challenge.validator.js"></script>
+
+<%- include('components/footer') %>

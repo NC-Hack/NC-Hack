@@ -1,0 +1,217 @@
+<%- include('components/header') %>
+<% let isMod = user ? ["admin", "organizer"].some(f => Object.keys(user.flags).filter(k => user.flags[k]).includes(f)) : false;
+
+if (challenge.judges.includes(user._id) && challenge.end < Date.now()) {
+submissions.forEach(s => {
+    let alreadyJudged = s.judging.length > 0 && !isMod;
+%>
+    <div class="modal fade" id="submissionJudge<%= s._id %>" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Submission Judging</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="results-id" hidden><%= s._id %></p>
+                    <% if (alreadyJudged) {
+                        %><p style="color:red;"><i class="material-icons" style="vertical-align:bottom;">info</i> This entry has already been judged. Past results can only be overridden by administrators.</p><%
+                    }%>
+                    <p style="white-space: pre-wrap;">Link: <a href="https://github.com<%= s.github %>">https://github.com/<%= s.github %></a><br><br>Description: <%= s.description %></p>
+                    <form action="/challenge/<%= challenge._id %>/submission/<%= s._id %>/judge" method="post">
+                        <%
+                            let cnum = 1;
+ challenge.criteria.forEach(c => {
+     %>
+                        <div class="form-group">
+                        <label><%= c.name %>
+                                <input name="judging[criteria]" value="<%= c.name %>" hidden>
+                            <select name="judging[score]" id="select-<%= s._id %>-<%= cnum %>" class="form-control result-criteria-<%= s._id %>" <%= alreadyJudged || (!isMod && s.disqualified) ? "disabled" : ""%>>
+                                <%
+                                    cnum++;
+                                    console.log(s.judging)
+                                    if (!s.judging.find(j => j.name === c.name)) {
+                                        %>
+                                <option value="" selected disabled>Select a score</option>
+                                <%
+                                    }
+                        let n = 0;
+                        while (n <= c.worth) {
+                            %>
+                                <option value="<%= n %>" <%= s.judging.find(j => j.name === c.name) && s.judging.find(j => j.name === c.name).score === n ? "selected" : "" %>><%= n %></option>
+                                <%
+                            n++;
+                        }
+ %>
+                            </select>
+                        </label>
+                        <br>
+                        </div>
+                        <%
+ })
+ %>
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control" name="notes" <%= alreadyJudged || (!isMod && s.disqualified) ? "disabled" : ""%>><%= s.notes %></textarea>
+                                    <span class="label">Additional Notes (Private to Judges Only)</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="dq" value="true" <%= s.disqualified ? "checked" : "" %> <%= alreadyJudged || (!isMod && s.disqualified) ? "disabled" : ""%>>
+                                <label class="form-check-label" for="dq">
+                                    Disqualified
+                                </label>
+                            </div>
+<br>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary modal-btn<%= alreadyJudged || (!isMod && s.disqualified) ? " aj" : ""%>" id="ui-results-btn-<%= s._id %>" disabled><%= s.judging.length > 0 ? "Edit" : "Submit" %> results</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+<%
+})
+}
+
+if (isMod) {
+    %>
+    <div class="modal fade" id="challengeJudgeAssignModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Judges</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>In order to appear here, a user must have the Judge flag.</p>
+                    <form action="/challenge/<%= challenge._id %>/judges" method="post" id="form">
+                        <% judges.forEach(j => {
+                            j = j[0];
+                        %>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="<%= j._id %>" value="true" <%= challenge.judges.includes(j._id) ? "checked" : "" %>>
+                            <label class="form-check-label" for="<%= j._id %>">
+                                <a href="/profile/<%= j.username %>"><%= j.name %></a>
+                            </label>
+                        </div>
+                        <%
+                        }) %>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary modal-btn" id="ui-assign-btn">Assign judges</button>
+                </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+<%
+}
+%>
+<div class="m-3">
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+            <h1>Judging Panel: <%= challenge.title %></h1>
+        <% if (!challenge.judges.includes(user._id)) { %>
+            <p>You are not an assigned judge for this challenge.<% if (isMod) { %> Assign judges on the <a href="/challenge/<%= challenge._id %>">challenge page</a>.<% } %></p>
+        <% } else if (Date.now() < challenge.end) { %>
+            <p>This challenge has not ended yet, therefore judging is locked.</p>
+        <% } else {
+            %><p><%= submissions.filter(s => s.judging.length === challenge.criteria.length || s.disqualified).length %> out of <%= submissions.length %> entries to this challenge have been judged.</p>
+        <%
+    if (isMod && submissions.filter(s => s.judging.length !== challenge.criteria.length && !s.disqualified).length === 0 && !challenge.resultsPublished) {
+        %>
+            <a href="/challenge/<%= challenge._id %>/publish" class="btn btn-success">Publish Results</a><br><br><%
+    }
+ %>
+        <table class="table table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Link</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                <%
+ submissions.forEach(s => {
+     let alreadyJudged = s.judging.length > 0;
+     %>
+                    <tr>
+                        <td><a href="https://github.com/<%= s.github %>"><%= s.github %></a> <%- s.disqualified ? "<span class=\"text-danger\">Disqualified</span>" : "" %></td>
+                        <td>
+                            <% if ((alreadyJudged || s.disqualified) && isMod) {
+                                %><a data-toggle="modal" class="btn btn-warning" style="color:white;"  data-target="#submissionJudge<%= s._id %>">View/Edit Results</a><%
+                            } else if (alreadyJudged || s.disqualified) {
+                                %><a data-toggle="modal" class="btn btn-secondary" style="color:white;"  data-target="#submissionJudge<%= s._id %>">View Results</a><%
+                            } else {
+                             %><a data-toggle="modal" class="btn btn-primary" style="color:white;"  data-target="#submissionJudge<%= s._id %>" <% s.disqualified ? "disabled" : ""%>>Judge</a><%
+                            }%>
+                        </td>
+                    </tr>
+                <%
+ })
+ %>
+                    </tbody>
+                </table>        <%
+        }%>
+    </div>
+</div>
+<% if (isMod) {%>
+<div class="m-3">
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+        <h1>Criteria Editor</h1>
+        <form method="post" action="/challenge/<%= challenge._id %>/criteria" accept-charset="utf-8">
+            <div id="criteria-area">
+                <% challenge.criteria.forEach(c => {
+                %>
+                    <div class="criteria-input">
+                        <input type="text" name="criteria[criteria]" placeholder="Criteria" value="<%= c.name %>"><br>
+                        <input type="number" name="criteria[worth]" placeholder="Worth" min="1" value="<%= c.worth %>"><br>
+                        <button type="button" class="btn btn-danger remove-btn"><i class="material-icons">remove_circle_outline</i> Remove Criteria</button>
+                    </div>
+                <%
+                }) %>
+            </div>
+            <button type="button" class="btn btn-primary" id="add-btn"><i class="material-icons">add_circle_outline</i> Add Criteria</button>
+            <button type="submit" class="btn btn-primary" id="ui-create-btn"><i class="material-icons">create</i> Save Changes</button>
+        </form>
+    </div>
+</div>
+<div class="m-3">
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+        <h1>Judges</h1>
+    <p>List:<br>
+        <% judges.forEach(j => {
+            j = j[0];
+            if (challenge.judges.includes(j._id)) {
+        %>
+        <a href="/profile/<%= j.username %>"><%= j.name %></a><br>
+        <%
+        }
+        }) %>
+</p>
+        <a data-toggle="modal" class="btn btn-primary" style="color:white;"  data-target="#challengeJudgeAssignModal">Assign Judges</a></div></div>
+<% } %>
+<script type="text/javascript" src="/js/criteria.validator.js"></script>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+<% if (isMod) {%>
+    <script>
+        let mdp = document.getElementById("md-preview");
+    mdp.innerHTML = (new showdown.Converter()).makeHtml(mdp.innerHTML);
+    document.getElementById("md-preview-card").hidden = false;
+    </script>
+<%}%>
+
+<%- include('components/footer') %>

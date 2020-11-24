@@ -1,0 +1,78 @@
+<%- include('components/header') %>
+
+<div class="mx-auto">
+  <div class=" is-1 level flat mx-auto">
+  </div>
+<br>
+  <div class="shadow mx-auto rounded p-4" style="width: 500px;">
+    <h3 class="text-center">Welcome!</h3>
+    <p class="text-center">Please fill out the fields below to sign up</p>
+    <hr>
+  <div>
+    <form action="/api/signup" method="post" id="form">
+      <div class="container">
+        <div class="mx-auto">
+          <div class="form-group input-group field">
+            <label class="has-float-label">
+              <input class="form-control" type="text" name="name" id="form-name" placeholder="ex. George Washington"/>
+              <span class="label">Name</span>
+            </label>
+          </div>
+          <p class="help errorMsg" id="form-name-help" hidden="true"></p>
+          <div class="form-group input-group field">
+            <label class="has-float-label">
+              <input class="form-control lower" type="text" name="username" id="form-username" placeholder="ex. cooldude1234"/>
+              <span class="label">Username</span>
+            </label>
+          </div>
+          <p class="help errorMsg" id="form-username-help" hidden="true"></p>
+          <div class="form-group input-group">
+            <label class="has-float-label field">
+              <input class="form-control lower" type="email" name="email" id="form-email" placeholder="ex. team@nchack.org" id="form-email"/>
+              <span class="label">Email</span>
+            </label>
+          </div>
+          <p class="help errorMsg" id="form-email-help" hidden="true"></p>
+          <div class="form-group input-group">
+            <label class="has-float-label field">
+              <input class="form-control" type="password" name="password" placeholder="Choose a secure password that you can remember" id="form-password"/>
+              <span class="label">Password</span>
+            </label>
+          </div>
+          <p class="help errorMsg" id="form-password-help" hidden="true"></p>
+          <div class="form-group input-group">
+            <label class="has-float-label field">
+              <input class="form-control" type="password" name="repassword" placeholder="The same password you typed above" id="form-repassword"/>
+              <span class="label">Confirm Password</span>
+            </label>
+          </div>
+          <p class="help errorMsg" id="form-repassword-help" hidden="true"></p>
+        </div>
+
+        <div class="field">
+          <div class="control">
+            <label class="checkbox">
+              <input type="checkbox" id="terms-check">
+              I agree to the <a href="/terms">terms and conditions</a>
+            </label>
+          </div>
+        </div>
+        <br>
+        <div class="row justify-between">
+          <div class="col">
+            <input id="submit-button" value="Sign Up" type="submit" class="btn btn-primary" disabled/>
+          </div>
+          <div class="col">
+            Already have an account? <a href="/login">Sign In</a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+  <div class="column is-1 level">
+  </div>
+</div>
+<script type="text/javascript" src="js/signup.validator.js"></script>
+
+<%- include('components/footer') %>

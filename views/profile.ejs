@@ -1,0 +1,476 @@
+<%- include('components/header') %>
+
+<!-- Modal -->
+<% let isMod = user ? ["admin", "organizer"].some(f => Object.keys(user.flags).filter(k => user.flags[k]).includes(f)) : false;
+if(isMod) { %>
+    <div class="modal fade" id="userHistoryModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User History</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                <% function infType (type) {
+                    switch(type) {
+                        case "suspend":
+                            return "Suspension";
+                        case "unsuspend":
+                            return "Suspension Removal"
+                        case "message":
+                            return "Message";
+                    }
+                }
+                if (infs.length > 0) infs.reverse().forEach(i => {
+                    %>
+                        <div><p>Type: <%= infType(i.type) %><br>Moderator: <a href="https://nchack.org/profile/<%= i.mod.username %>"><%= i.mod.name %></a> <%= i.anonymous ? "(Sent anonymously)" : ""%><br>Date: <%= i.created.toString() %><br>Noticed: <%= i.noticed ? "Yes" : "No"%><br>Link: <a href="https://nchack.org/message/<%= i._id %>">Here</a><br>Reason: <span style="white-space: pre-wrap;"><%= i.reason %></span></p></div><hr>
+                <%
+                })
+                else {
+                    %>
+                        <div><p>No logs found</p></div>
+                    <%
+                }%>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="messageUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Message User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/api/message" method="post" id="form">
+                        <div class="modal-body">
+                            <div class="form-group input-group field">
+                                <label class="has-float-label">
+                                    <textarea class="form-control" type="text" name="reason" id="form-m-reason"></textarea>
+                                    <span class="label">Message Content</span>
+                                </label>
+                            </div>
+                            <p class="help errorMsg" id="form-m-reason-help" hidden="true"></p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="form-anonymous" value="true">
+                                <label class="form-check-label" for="form-anonymous">
+                                    Anonymous
+                                </label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="uid" value="<%= profile._id %>"/>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary modal-btn" id="ui-message-btn" disabled>Send message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%
+if (!profile.flags.suspended) {%>
+    <div class="modal fade" id="suspendModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Suspend User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/api/suspend" method="post" id="form">
+                    <div class="modal-body">
+                        <p style="color:red;"><i class="material-icons" style="vertical-align:bottom;">error_outline</i> This user will lose access to their account and be shown the message you specify below.</p>
+                        <div class="form-group input-group field">
+                            <label class="has-float-label">
+                                <textarea class="form-control" type="text" name="reason" id="form-reason"></textarea>
+                                <span class="label">Suspension Reason</span>
+                            </label>
+                        </div>
+                        <p class="help errorMsg" id="form-reason-help" hidden="true"></p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="form-anonymous" value="true">
+                            <label class="form-check-label" for="form-anonymous">
+                                Anonymous
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" name="uid" value="<%= profile._id %>"/>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger modal-btn" id="ui-suspend-btn" disabled>Suspend user</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+        <% } else if (profile.flags.suspended) { %>
+    <div class="modal fade" id="unsuspendModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Unsuspend User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/api/unsuspend" method="post" id="form">
+                    <div class="modal-body">
+                        <% let filteredInfs = infs.filter(i => i.type === "suspend");
+                        let suspension = filteredInfs[filteredInfs.length-1]; %>
+                       <p style="color:red;"><i class="material-icons" style="vertical-align:bottom;">info</i> This user was suspended on <%= suspension.created.toString() %> by <%= suspension.mod.name %>.<br>Reason: <span style="white-space: pre-wrap;"><%= suspension.reason %></span></p>
+                       <div class="form-group input-group field">
+                            <label class="has-float-label">
+                                <textarea class="form-control" type="text" name="reason" id="form-u-reason"></textarea>
+                                <span class="label">Unsuspension Reason</span>
+                            </label>
+                        </div>
+                        <p class="help errorMsg" id="form-u-reason-help" hidden="true"></p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="form-anonymous" value="true">
+                            <label class="form-check-label" for="form-anonymous">
+                                Anonymous
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" name="uid" value="<%= profile._id %>"/>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger modal-btn" id="ui-unsuspend-btn" disabled>Unsuspend user</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<% }
+    if (user.flags.admin) {
+        %>
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/api/delete" method="post" id="form">
+                    <div class="modal-body">
+                        <p style="color:red;"><i class="material-icons" style="vertical-align:bottom;">error_outline</i> This user will permanently be removed from the site.</p>
+                        <div class="form-group input-group field">
+                            <label class="has-float-label">
+                                <textarea class="form-control" type="text" name="reason" id="form-del-reason"></textarea>
+                                <span class="label">Deletion Reason</span>
+                            </label>
+                        </div>
+                        <p class="help errorMsg" id="form-del-reason-help" hidden="true"></p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="form-anonymous" value="true">
+                            <label class="form-check-label" for="form-anonymous">
+                                Anonymous
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" name="uid" value="<%= profile._id %>"/>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger modal-btn" id="ui-delete-btn" disabled>Delete user</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<%
+    }
+    }
+if(isRoot || (user && isMod)) { %>
+<div class="modal fade" id="userInfoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/api/profile/edit" method="post" id="form">
+            <div class="modal-body">
+                <h6 class="modal-title">User Information</h6>
+                <br>
+                <div class="form-group input-group field">
+                    <label class="has-float-label">
+                        <input class="form-control" type="text" name="name" id="form-name" value="<%= profile.name %>"/>
+                        <span class="label">Name</span>
+                    </label>
+                </div>
+                <p class="help errorMsg" id="form-name-help" hidden="true"></p>
+                <div class="form-group input-group field">
+                    <label class="has-float-label">
+                        <input class="form-control lower" type="text" name="username" id="form-username" value="<%= profile.username %>"/>
+                        <span class="label">Username</span>
+                    </label>
+                </div>
+                <input type="text" id="username-old" value="<%= profile.username %>" hidden/>
+                <p class="help errorMsg" id="form-username-help" hidden="true"></p>
+                <div class="form-group input-group field">
+                    <label class="has-float-label">
+                        <input class="form-control lower" type="email" name="email" id="form-email" value="<%= profile.email %>" <%- isRoot || (user && Object.keys(user.flags).filter(f => user.flags[f]).includes("admin")) ? "" : "disabled" %>/>
+                        <span class="label">Email</span>
+                    </label>
+                </div>
+                <input type="text" id="email-old" value="<%= profile.email %>" hidden/>
+                <p class="help errorMsg" id="form-email-help" hidden="true"></p>
+                <div class="form-group input-group field">
+                    <label class="has-float-label">
+                        <textarea class="form-control" type="text" name="bio" id="form-bio" maxlength="700"><%= profile.bio %></textarea>
+                        <span class="label">Bio</span>
+                    </label>
+                </div>
+                <hr>
+                <h6 class="modal-title">Avatar</h6>
+                <img src="<%= profile.avatar || "/images/default.png" %>" style="margin:0 auto;width: 50px; height: 50px; object-fit: cover;" class="rounded-circle m-2" id="profile-avatar">
+                <div class="form-group input-group field">
+                    <label class="has-float-label">
+                        <input class="form-control lower" type="text" name="avatar" id="form-avatar" value="<%= profile.avatar %>" />
+                        <span class="label">Avatar URL</span>
+                    </label>
+                </div>
+                <p class="help errorMsg" id="form-avatar-help" hidden="true"></p>
+                <hr>
+                <% if (isRoot || user.flags.admin) { %>
+                <h6 class="modal-title">Change Password</h6>
+                <br>
+                <div class="form-group input-group">
+                    <label class="has-float-label field">
+                        <input class="form-control" type="password" name="password" placeholder="Choose a secure password that you can remember" id="form-password"/>
+                        <span class="label">New Password</span>
+                    </label>
+                </div>
+                <p class="help errorMsg" id="form-password-help" hidden="true"></p>
+                <div class="form-group input-group">
+                    <label class="has-float-label field">
+                        <input class="form-control" type="password" name="repassword" placeholder="The same password you typed above" id="form-repassword"/>
+                        <span class="label">Confirm New Password</span>
+                    </label>
+                </div>
+                <% }
+                if(user && isMod) { %>
+                <hr>
+                <h6 class="modal-title">User Flags</h6>
+                <% const flags = Object.keys(profile.flags).filter(k => profile.flags[k]); %>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="form-flag-admin" value="true" <%= flags.includes("admin") ? "checked" : "" %> <%= !Object.keys(user.flags).filter(k => user.flags[k]).includes("admin") ? "disabled" : "" %>>
+                    <label class="form-check-label" for="form-flag-admin"%>>
+                        Website Administrator
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="form-flag-organizer" value="true" <%= flags.includes("organizer") ? "checked" : "" %>>
+                    <label class="form-check-label" for="form-flag-organizer">
+                        Organizer
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="form-flag-judge" value="true" <%= flags.includes("judge") ? "checked" : "" %>>
+                    <label class="form-check-label" for="form-flag-judge">
+                        Judge
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="form-flag-mentor" value="true" <%= flags.includes("mentor") ? "checked" : "" %>>
+                    <label class="form-check-label" for="form-flag-mentor">
+                        Mentor
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="form-flag-host" value="true" <%= flags.includes("host") ? "checked" : "" %>>
+                    <label class="form-check-label" for="form-flag-host">
+                        Host
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="form-flag-sponsor" value="true" <%= flags.includes("sponsor") ? "checked" : "" %>>
+                    <label class="form-check-label" for="form-flag-sponsor">
+                        Sponsor
+                    </label>
+                </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="form-flag-verified" value="true" <%= flags.includes("verified") ? "checked" : "" %>>
+                        <label class="form-check-label" for="form-flag-verified">
+                            Verified
+                        </label>
+                    </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="form-flag-participant" value="true" <%= flags.includes("participant") ? "checked" : "" %>>
+                    <label class="form-check-label" for="form-flag-participant">
+                        Participant
+                    </label>
+                </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="form-flag-no_edit" value="true" <%= flags.includes("no_edit") ? "checked" : "" %>>
+                        <label class="form-check-label" for="form-flag-no_edit">
+                            Cannot Edit Profile
+                        </label>
+                    </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="email-verification-exempt-check" name="email-verification-exempt" value="true" <%= profile.emailValidated ? "disabled" : "" %>>
+                    <label class="form-check-label" for="email-verification-exempt">
+                        Exempt From Email Verification
+                    </label>
+                </div>
+                    <hr>
+                    <h6 class="modal-title">Team</h6>
+                <p><%- profile.team ? `This user is a member of team <a href="/profile/team${profile.team}">${profile.team}</a>` : "This user is not a member of a team."%></p>
+                    <% } %>
+                <input type="hidden" name="uid" value="<%= profile._id %>"/>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary modal-btn" id="ui-save-btn">Save changes</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<div class="container row m-3 mx-auto">
+    <div style="width:auto;text-align:center;">
+        <img src="<%= profile.avatar || "/images/default.png" %>" style="margin:0 auto;width: 160px; height: 160px; object-fit: cover;" class="rounded-circle m-2">
+        <%
+        const translation = {
+            "admin": {
+                icon: "admin_panel_settings",
+                color: "blue",
+                tooltip: "Website Administrator"
+            },
+            "organizer": {
+                icon: "beenhere",
+                color: "gold",
+                tooltip: "Organizer"
+            },
+            "judge": {
+                icon: "gavel",
+                color: "green",
+                tooltip: "Judge"
+            },
+            "sponsor": {
+                icon: "monetization_on",
+                color: "darkgreen",
+                tooltip: "Sponsor"
+            },
+            "mentor": {
+                icon: "help",
+                color: "#59dbbb",
+                tooltip: "Mentor"
+            },
+            "host": {
+                icon: "videocam",
+                color: "lightblue",
+                tooltip: "Talk Host"
+            },
+            "winner": {
+                icon: "emoji_events",
+                color: "gold",
+                tooltip: "Winner"
+            },
+            "team": {
+                icon: "group",
+                color: "pink",
+                tooltip: "Team User"
+            },
+            "no_email": {
+                icon: "no_cell",
+                color: "red",
+                tooltip: "Email Not Verified",
+                hidden: true
+            },
+            "no_edit": {
+                icon: "blur_off",
+                color: "red",
+                tooltip: "Cannot Edit Profile",
+                hidden: true
+            },
+            "suspended": {
+                icon: "block",
+                color: "red",
+                tooltip: "Suspended",
+                hidden: true
+            },
+            "verified": {
+                icon: "verified",
+                color: "#4ba8fa",
+                tooltip: "Verified"
+            }
+        }
+
+        const badgeList = Object.keys(profile.flags).filter(k => translation[k] && profile.flags[k] && (translation[k].hidden ? isMod : true));
+        if (!profile.emailValidated && isMod) badgeList.push("no_email");
+        const badges = badgeList.map(k => `<i class="material-icons" style="color:${translation[k].color};cursor:pointer;" data-toggle="tooltip" data-placement="top" title="${translation[k].tooltip}">${translation[k].icon}</i>`);
+        let badgeLines = [];
+        for (let i = 0; i < badges.length; i+= 6){
+            badgeLines.push(badges.slice(i,i+6).join(" "));
+        }
+        badgeLines = badgeLines.join("<br>");
+        %>
+        <%- badgeLines.length >= 1 ? `<p class="subtitle is-6 m-2" style="margin-top:25px">${badgeLines}</p>` : "" %>
+    </div>
+    <div class="col">
+        <div class="m-2">
+            <h1 class="m-2" style="padding-top:5px;"><%= profile.name %></h1>
+            <p class="subtitle is-6 m-2" style="margin-top:0;padding-top:0;width:80%;word-wrap: break-word;white-space: pre-wrap;">@<%= profile.username %> <%= profile.bio ? `- ${profile.bio}` : ""%></p>
+            <div class="row mx-auto">
+                <% if(isRoot && !user.flags.no_edit) { %>
+                    <a class="btn btn-primary m-2" style="color:white" data-toggle="modal" data-target="#userInfoModal">Edit Profile</a>
+                <% } %>
+                <% if (user && isMod) { %>
+                        <div class="dropdown">
+                            <a class="btn btn-danger dropdown-toggle m-2" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Moderation Actions
+                            </a>
+                            <div class="dropdown-menu moderation-actions-menu" aria-labelledby="dropdownMenuButton">
+                                <a data-toggle="modal" data-target="#messageUserModal" class="dropdown-item" style="color:blue;vertical-align:middle;cursor:pointer;"><i class="material-icons" style="vertical-align:bottom;">message</i> Message User</a>
+                                <a data-toggle="modal" data-target="#userInfoModal" class="dropdown-item" style="color:blue;vertical-align:middle;cursor:pointer;"><i class="material-icons" style="vertical-align:bottom;">create</i> Edit User</a>
+                                <a data-toggle="modal" data-target="#userHistoryModal" class="dropdown-item" style="color:blue;vertical-align:middle;cursor:pointer;"><i class="material-icons" style="vertical-align:bottom;">history</i> View History</a>
+                                <% if (!profile.flags.suspended) { %><a class="dropdown-item" data-toggle="modal" data-target="#suspendModal" style="color:red;vertical-align:middle;cursor:pointer;"><i class="material-icons" style="vertical-align:bottom;">remove_circle_outline</i> Suspend User</a><% } else { %>
+                                    <a class="dropdown-item" data-toggle="modal" data-target="#unsuspendModal" style="color:red;vertical-align:middle;"><i class="material-icons" style="vertical-align:bottom;cursor:pointer;">lock_open</i> Unsuspend User</a> <% } %>
+                                <% if (Object.keys(user.flags).filter(f => user.flags[f]).includes("admin")) { %><a class="dropdown-item" data-toggle="modal" data-target="#deleteModal" style="color:red;vertical-align:middle;"><i class="material-icons" style="vertical-align:bottom;">report</i> Delete User</a><% } %>
+                            </div>
+                        </div>
+                <% }%>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<hr>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<div class="container">
+
+    <h1 class="font-weight-light text-center text-lg-left mt-4 mb-0">Submissions</h1>
+
+<br>
+
+    <% if (true) {%>
+    <p>There's nothing here yet</p>
+    <% } else { %>
+
+    <% } %>
+</div>
+
+<script type="text/javascript" src="/js/edit-profile.validator.js"></script>
+
+<%- include('components/footer') %>

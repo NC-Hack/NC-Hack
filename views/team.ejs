@@ -1,0 +1,59 @@
+<%- include('components/header') %>
+
+<!-- Modal -->
+<div class="m-3">
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+        <% if (tried) {
+            %>
+            <p class="help errorMsg announcement-text" style="border-radius: 5px;white-space: pre-wrap;">Invalid team code</p>
+        <%
+        }%>
+        <h1>Your Team</h1>
+        <p><% if (!user.team) { %>You are not a member of a team! If you'd like to join a team (it's optional!) you can enter a code below.</p> <% } else { %>
+                You are a member of a team! You can share your team code with your friends: <code><%= user.team %></code><br>
+                <br>Team members:</p>
+            <%
+            team_members.forEach(m => {
+                %>
+                <img src="<%- m.avatar || "/images/default.png" %>" style="width: 30px; height: 30px; object-fit: cover;vertical-align:top;margin-top:0 !important;margin-right:1px !important;margin-bottom:0 !important;" class="rounded-circle m-2 d-inline">
+                <p class="subtitle is-6 m-2 d-inline" style="margin-top:25px;"><%- `<a href="https://nchack.org/profile/${m.username}">${m.name}</a>` %></p><br>
+            <%
+            })
+            %>
+                <br>
+                <form action="/api/team/leave" method="post" id="form">
+                    <button type="submit" class="btn btn-danger" id="join-btn"><i class="material-icons">exit_to_app</i> Leave team</button>
+                </form>
+            <%
+        } %><% if (!user.team) {
+            %>
+            <form action="/api/team/join" method="post" id="form">
+                        <div class="form-group input-group field">
+                            <label class="has-float-label">
+                                <input class="form-control" type="text" name="code" id="form-code" placeholder=" "/>
+                                <span class="label">Team code</span>
+                            </label>
+                        </div>
+                <button type="submit" class="btn btn-primary" id="join-btn" disabled><i class="material-icons">group_add</i> Join team</button>
+            </form>
+            <hr>
+        <h3>Create a Team</h3>
+            <form action="/api/team/create" method="post" id="form">
+                <button type="submit" class="btn btn-primary" id="join-btn"><i class="material-icons">add_circle</i> Create a team</button>
+            </form>
+        <%
+        }%>
+    </div>
+</div>
+
+<script>
+    let joinBtn = document.getElementById("join-btn");
+    if (joinBtn) {
+        document.getElementById("form-code").addEventListener("input", function() {
+            if (!this.value && !joinBtn.disabled) joinBtn.disabled = true;
+            else if (this.value && joinBtn.disabled) joinBtn.disabled = false;
+        });
+    }
+</script>
+
+<%- include('components/footer') %>

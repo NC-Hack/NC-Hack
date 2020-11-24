@@ -1,0 +1,45 @@
+<%- include('components/header') %>
+<% if (sent.yes) { %>
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+        <h1 class="m-3">Password Reset</h1>
+        <h4 class="m-3">We've sent an email to <%= sent.email %> with your new password. Use that to log in, then change your password!</h4>
+    </div>
+<% } else { %>
+<div class="mx-auto">
+    <div class=" is-1 level flat mx-auto">
+    </div>
+    <br>
+    <div class="shadow mx-auto rounded p-4" style="width: 500px;">
+        <h3 class="text-center">Forgot your password?</h3>
+        <p class="text-center">Enter the email associated with your account below and we'll help you regain access to your account</p>
+        <hr>
+        <div>
+            <form action="/api/forgot" method="post" id="form">
+                <div class="container">
+                    <div class="mx-auto">
+                        <% if (message.length > 0) { %>
+                            <p class="help errorMsg" style="border-radius: 5px;"><%= message %></p>
+                        <% } %>
+                        <div class="form-group input-group field">
+                            <label class="has-float-label">
+                                <input class="form-control lower" type="text" name="email" id="form-email" placeholder="The email associated with your account"/>
+                                <span class="label">Account Email</span>
+                            </label>
+                        </div>
+                        <p class="help errorMsg" id="form-email-help" hidden="true"></p>
+                    </div>
+                    <div class="row justify-between">
+                        <div class="col">
+                            <input id="submit-button" value="Submit" type="submit" class="btn btn-primary" disabled/>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="column is-1 level">
+    </div>
+</div>
+<script type="text/javascript" src="js/forgot.validator.js"></script>
+<% } %>
+<%- include('components/footer') %>

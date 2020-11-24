@@ -1,0 +1,14 @@
+<%- include('components/header') %>
+<div class="m-3">
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+        <% if (resent) { %>
+        <h1 class="m-3">Verification Email Re-Sent</h1>
+        <h4 class="m-3">We've sent another email to <%- user.email %> with a link to verify your account. Once you verify, you'll have full access to the site!</h4>
+        <% } else { %>
+        <h1 class="m-3">Verify Your Account</h1>
+        <h4 class="m-3">We've sent an email to <%- user.email %> with a link to verify your account. Once you verify, you'll have full access to the site!</h4>
+        <% } %>
+        <button class="m-2 btn btn-primary" onclick="location.href='/api/verify/regenerate';">Resend Verification Email</button>
+    </div>
+</div>
+<%- include('components/footer') %>
