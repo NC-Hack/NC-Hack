@@ -12,7 +12,7 @@ function matchDate(d) {
 }
 let eventsInOrder = Object.keys(sortedEvents).sort((a, b) => matchDate(b) - matchDate(a)).reverse();
 if(isMod) { %>
-    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" sty id="eventModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -163,6 +163,7 @@ if(isMod) { %>
             </div>
         </div>
     </div>
+
     <% eventsInOrder.forEach(k => {
         let eventsForEdit = sortedEvents[k].filter(e => !e.judges).sort((a, b) => a.start - b.start);
     eventsForEdit.forEach(e => {%>
@@ -245,6 +246,7 @@ if(isMod) { %>
     </div>
         <% }) })%>
 <% } %>
+
 <% if (isMod) { %><br><br><a class="btn btn-primary m-2" style="color:white;margin: 0 auto !important;display:block !important;width: 30%;" data-toggle="modal" data-target="#eventModal"><i class="material-icons">event</i> Create Event</a><br><a class="btn btn-primary m-2" style="color:white;margin: 0 auto !important;display:block !important;width: 30%;" data-toggle="modal" data-target="#challengeModal"><i class="material-icons">emoji_events</i> Create Challenge</a><% } %>
 <div class="container m-3 mx-auto">
     <br><br>
@@ -275,6 +277,7 @@ if(isMod) { %>
             </div>
         </div>
     <br>
+
     <%
     }
     });
@@ -283,6 +286,9 @@ if(isMod) { %>
         let eventsOnDay = sortedEvents[k].filter(e => new Date(e.end.getTime()) < Date.now() && (e.hidden ? isMod : true)).sort((a, b) => a.start - b.start);
     if (eventsOnDay.length > 0) {
     %>
+    <div style="min-height: 500px;">
+        
+    </div>
         <div class="row row-striped">
             <div class="col-2 text-right">
                 <h1 class="display-4"><span class="badge badge-secondary"><%= matchDate(k).getDate() %></span></h1>

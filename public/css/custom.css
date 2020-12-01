@@ -44,7 +44,18 @@ img:hover {
     height: 50vh;
     /*min-height: 50px;*/
     width: 40em;
-    background-image: url('/images/hack1.jpg');
+    background-image: url('/images/christmas.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: inline-block;
+    margin: 0 auto;
+  }
+  .getstarted {
+    height: 50vh;
+    /*min-height: 50px;*/
+    width: 40em;
+    background-image: url('/images/coffee.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -131,9 +142,6 @@ img:hover {
 }
 
 
-.footer {
-    background-color: rgb(29, 238, 221);
-}
 
 .linkfix:hover {
     text-decoration: underline !important;
