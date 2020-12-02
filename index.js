@@ -1,5 +1,4 @@
 const express = require("express");
-const fileUpload = require('express-fileupload');
 const app = express();
 const port = process.env.PORT || 8080;
 const mongoose = require("mongoose");
@@ -9,13 +8,10 @@ const flash = require("connect-flash");
 const morgan = require("morgan");
 var cors = require('cors');
 const fs = require("fs")
-const Sentry = require('@sentry/node');
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const path = require("path");
-const stripe = require('stripe')('sk_test_zMLclFRUPJiYNNpVp2agy2lw00dViSI4Ob');
-Sentry.init({ dsn: 'https://f0e3dc3b9d3148d8a7cbcc7a57325a9e@o195352.ingest.sentry.io/5352182' });
 require('dotenv').config();
 
 // Configuration
@@ -37,9 +33,6 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(__dirname + "/public"));
 app.use(express.static(__dirname + "/scripts"));
-
-  // This is Express.js middleware to parse and handle the files we upload from our HTML page
-  app.use(fileUpload());
 
 
 
