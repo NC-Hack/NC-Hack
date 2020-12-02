@@ -7,7 +7,6 @@ const signale = require('signale');
 const flash = require("connect-flash");
 const morgan = require("morgan");
 var cors = require('cors');
-const fs = require("fs")
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -19,7 +18,7 @@ mongoose.connect(process.env.MONGO, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
-require("./config/passport.config")(passport, stripe);
+require("./config/passport.config")(passport);
 
 // Express setup
 app.use(morgan("dev"));
@@ -48,7 +47,7 @@ app.use(passport.authenticate('remember-me'));
 app.use(flash());
 
 // Routes
-require("./routes/routes")(app, passport, stripe, fs, signale);
+require("./routes/routes")(app, passport);
 
 // Launch server
 app.listen(port, () => signale.success(`Server Started on Port ${port}`));
