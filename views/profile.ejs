@@ -123,7 +123,7 @@ if (!profile.flags.suspended) {%>
                 <form action="/api/unsuspend" method="post" id="form">
                     <div class="modal-body">
                         <% let filteredInfs = infs.filter(i => i.type === "suspend");
-                        let suspension = filteredInfs[filteredInfs.length-1]; %>
+                        let suspension = filteredInfs[filteredInfs.length-1] || { created: "[Administrative Suspension", reason: "[Administrative Suspension", mod: { name: "[Administrative Suspension" }; %>
                        <p style="color:red;"><i class="material-icons" style="vertical-align:bottom;">info</i> This user was suspended on <%= suspension.created.toString() %> by <%= suspension.mod.name %>.<br>Reason: <span style="white-space: pre-wrap;"><%= suspension.reason %></span></p>
                        <div class="form-group input-group field">
                             <label class="has-float-label">
