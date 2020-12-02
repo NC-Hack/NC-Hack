@@ -80,12 +80,15 @@ module.exports = async passport => {
       if (user.flags.suspended) {
         let infs = await Infraction.find({ user_id: user._id, type: "suspend" });
         let inf = infs[infs.length-1];
-        if (!inf.noticed) {
-          inf.noticed = true;
-          inf.save();
+        if (inf) {
+          if (!inf.noticed) {
+            inf.noticed = true;
+            inf.save();
+          }
+          let mod = !inf.anonymous ? await User.findOne({_id: inf.moderator_id}) : null;
+          return done(null, false, req.flash("loginMessage", [`<strong>Your account has been suspended${!inf.anonymous ? ` by ${mod.name}` : ""}.</strong>`, `${inf && inf.reason ? `\n${inf.reason}` : ""}`]));
         }
-        let mod = !inf.anonymous ? await User.findOne({ _id: inf.moderator_id }) : null;
-        return done(null, false, req.flash("loginMessage", [`<strong>Your account has been suspended${!inf.anonymous ? ` by ${mod.name}` : ""}.</strong>`, `${inf && inf.reason ? `\n${inf.reason}` : ""}`]));
+        return done(null, false, req.flash("loginMessage", [`<strong>Your account has been suspended.</strong>`, ""]));
       }
       const token = crypto.randomBytes(64).toString('hex');
       user.token = token;
