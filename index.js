@@ -65,21 +65,21 @@ client.on("ready", () => {
   botApp.listen(1337, () => signale.success(`Bot Client Listening on Port 1337`));
   router.post("/user/:user/connect", (req, res) => {
     if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
-    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(() = {});
+    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
     if (member) member.roles.add("737326939546583052", "Connected account");
     res.sendStatus(200);
   });
   router.post("/user/:user/disconnect", (req, res) => {
     if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
-    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(() = {});
+    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
     if (member) member.roles.remove("737326939546583052", "Disconnected account");
     res.sendStatus(200);
   });
   router.post("/user/:user/participant", (req, res) => {
     if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
-    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(() = {});
+    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
     if (member) member.roles.add("737327030022176818", "Participant");
     res.sendStatus(200);
@@ -97,7 +97,7 @@ client.on("ready", () => {
       verified: "745002844259614830",
       winner: "746110403733618772"
     };
-    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(() = {});
+    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
     if (member) {
       Object.keys(flagsToRoles).forEach(f => {
