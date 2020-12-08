@@ -14,9 +14,6 @@ const axios = require("axios");
 module.exports = (app, passport) => {
   require('dotenv').config();
   // -- PUBLIC --
-  app.post("/user/:user/connect", (req, res) => {
-    console.log("It's going to the reg app")
-  });
   // Home Page
   app.get("/", (req, res) => res.render("home", {
     isAuth: req.isAuthenticated(),
@@ -235,11 +232,10 @@ module.exports = (app, passport) => {
                 'Authorization': `Bot ${process.env.DISCORD_AUTH_TOKEN}`
               }
             });
-            console.log(addReq)
             if (addReq.status === 204) {
               axios.post(`http://nchack.org:8880/user/${user.discord_id}/connect`, {}, { headers: {
                 "Authorization": process.env.DISCORD_AUTH_TOKEN
-                } });
+                } }).then(a => console.log(a));
             }
             axios.post(`http://nchack.org:8880/user/${user.discord_id}/roles`, {}, { headers: {
                 "Authorization": process.env.DISCORD_AUTH_TOKEN,
