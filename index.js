@@ -89,7 +89,7 @@ client.on("ready", () => {
       winner: "746110403733618772"
     };
     client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
-    let member = client.guilds.cache.get("726440966327631933").members.cache.get(ruser);
+    let member = client.guilds.cache.get("726440966327631933").members.cache.get(user);
     if (member) {
       Object.keys(flagsToRoles).forEach(f => {
         if (flagsToRoles[f] && flags[f] && !member.roles.cache.has(flagsToRoles[f])) member.roles.add(flagsToRoles[f]);
