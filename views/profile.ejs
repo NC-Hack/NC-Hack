@@ -306,6 +306,18 @@ if(isRoot || (user && isMod)) { %>
                             Verified
                         </label>
                     </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="form-flag-beta" value="true" <%= flags.includes("beta") ? "checked" : "" %>>
+                        <label class="form-check-label" for="form-flag-beta">
+                            Beta
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="form-flag-snowman" value="true" <%= flags.includes("snowman") ? "checked" : "" %>>
+                        <label class="form-check-label" for="form-flag-snowman">
+                            Snowman
+                        </label>
+                    </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="form-flag-participant" value="true" <%= flags.includes("participant") ? "checked" : "" %>>
                     <label class="form-check-label" for="form-flag-participant">
@@ -408,6 +420,16 @@ if(isRoot || (user && isMod)) { %>
                 icon: "verified",
                 color: "#4ba8fa",
                 tooltip: "Verified"
+            },
+            "snowman": {
+                icon: "ac_unit",
+                color: "#aef2ff",
+                tooltip: "Snowman"
+            },
+            "beta": {
+                icon: "science",
+                color: "#6ec374",
+                tooltip: "Beta"
             }
         }
 
