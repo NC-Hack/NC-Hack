@@ -101,6 +101,9 @@ client.on("ready", () => {
 });
 
 client.on("message", async (message) => {
+  if (message.content.toLowerCase().startsWith("?snowman")) {
+    message.channel.send(":snowman:")
+  }
   if (message.content.toLowerCase().startsWith("?user") || message.content.toLowerCase().startsWith("?profile")) {
     const UserModel = require("./models/user.model.js");
     let args = message.content.split(" ");
