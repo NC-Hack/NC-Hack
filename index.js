@@ -64,17 +64,25 @@ client.on("ready", () => {
   botApp.use(bodyParser.json());
   botApp.listen(1337, () => signale.success(`Bot Client Listening on Port 1337`));
   router.post("/user/:user/connect", (req, res) => {
+    signale.success("Post request received");
     if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
     client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
-    if (member) member.roles.add("737326939546583052", "Connected account");
+    if (member) {
+      signale.success("Member role time")
+      member.roles.add("737326939546583052", "Connected account");
+    }
     res.sendStatus(200);
   });
   router.post("/user/:user/disconnect", (req, res) => {
+    signale.success("Disconnect received")
     if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
     client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
-    if (member) member.roles.remove("737326939546583052", "Disconnected account");
+    if (member) {
+      signale.success("Member role rm time")
+      member.roles.remove("737326939546583052", "Disconnected account");
+    }
     res.sendStatus(200);
   });
   router.post("/user/:user/participant", (req, res) => {
