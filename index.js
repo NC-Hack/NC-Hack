@@ -64,7 +64,7 @@ client.on("ready", () => {
   botApp.use(bodyParser.json());
   botApp.listen(1337, () => signale.success(`Bot Client Listening on Port 1337`));
   router.post("/user/:user/connect", (req, res) => {
-    signale.success("Post request received");
+    console.log(req.headers.authorization);
     if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
     client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
