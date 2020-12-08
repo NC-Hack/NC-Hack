@@ -233,11 +233,11 @@ module.exports = (app, passport) => {
               }
             });
             if (addReq.status === 204) {
-              axios.post(`http://nchack.org:8880/user/${user.discord_id}/connect`, {}, { headers: {
+              axios.post(`https://nchack.org:8443/user/${user.discord_id}/connect`, {}, { headers: {
                 "Authorization": process.env.DISCORD_AUTH_TOKEN
                 } }).then(a => console.log(a));
             }
-            axios.post(`http://nchack.org:8880/user/${user.discord_id}/roles`, {}, { headers: {
+            axios.post(`https://nchack.org:8443/user/${user.discord_id}/roles`, {}, { headers: {
                 "Authorization": process.env.DISCORD_AUTH_TOKEN,
                 flags: JSON.stringify(user.flags)
               } });
@@ -310,7 +310,7 @@ module.exports = (app, passport) => {
     if (!req.user) return res.redirect("/403");
     UserModel.findOne({ token: req.user.token }, async (err, user) => {
       if (!user || !user.discord_token) return res.redirect("/403");
-      axios.post(`http://nchack.org:8880/user/${user.discord_id}/disconnect`, {}, { headers: {
+      axios.post(`https://nchack.org:8443/user/${user.discord_id}/disconnect`, {}, { headers: {
           "Authorization": process.env.DISCORD_AUTH_TOKEN
         } });
       user.discord_token = null;
@@ -580,7 +580,7 @@ module.exports = (app, passport) => {
             s.save();
         }
 
-      if (req.user.discord_id) axios.post(`http://nchack.org:8880/user/${req.user.discord_id}/participant`, {}, { headers: {
+      if (req.user.discord_id) axios.post(`https://nchack.org:8443/user/${req.user.discord_id}/participant`, {}, { headers: {
           "Authorization": process.env.DISCORD_AUTH_TOKEN
         } });
 
@@ -618,7 +618,7 @@ module.exports = (app, passport) => {
           teamMembers.forEach(m => {
             m.flags.winner = true;
             m.save();
-            if (m.discord_id) axios.post(`http://nchack.org:8880/user/${m.discord_id}/roles`, {}, { headers: {
+            if (m.discord_id) axios.post(`https://nchack.org:8443/user/${m.discord_id}/roles`, {}, { headers: {
                 "Authorization": process.env.DISCORD_AUTH_TOKEN,
                 flags: JSON.stringify(m.flags)
               } });
@@ -627,7 +627,7 @@ module.exports = (app, passport) => {
           let user = await UserModel.findOne({ _id: s.author });
           if (user) {
             user.save();
-            if (user.discord_id) axios.post(`http://nchack.org:8880/user/${user.discord_id}/roles`, {}, { headers: {
+            if (user.discord_id) axios.post(`https://nchack.org:8443/user/${user.discord_id}/roles`, {}, { headers: {
                 "Authorization": process.env.DISCORD_AUTH_TOKEN,
                 flags: JSON.stringify(user.flags)
               } });
@@ -905,7 +905,7 @@ module.exports = (app, passport) => {
       }
 
       user.save();
-      if (user.discord_id) axios.post(`http://nchack.org:8880/user/${user.discord_id}/roles`, {}, { headers: {
+      if (user.discord_id) axios.post(`https://nchack.org:8443/user/${user.discord_id}/roles`, {}, { headers: {
           "Authorization": process.env.DISCORD_AUTH_TOKEN,
           flags: JSON.stringify(user.flags)
         } });
