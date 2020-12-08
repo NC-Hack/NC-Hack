@@ -62,7 +62,7 @@ client.on("ready", () => {
   botApp.use("/", router);
   botApp.use(bodyParser.urlencoded({ extended: false }));
   botApp.use(bodyParser.json());
-  botApp.listen(8443, () => signale.success(`Bot Client Listening on Port 8443`));
+  botApp.listen(8880, () => signale.success(`Bot Client Listening on Port 8880`));
   router.post("/user/:user/connect", (req, res) => {
     console.log(req.headers.authorization);
     if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
