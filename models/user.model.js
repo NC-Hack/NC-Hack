@@ -26,6 +26,8 @@ let userSchema = new Schema({
     winner: { type: Boolean, default: false },
     team: { type: Boolean, default: false },
     participant: { type: Boolean, default: true },
+    snowman: { type: Boolean, default: false },
+    beta: { type: Boolean, default: false },
     no_edit: { type: Boolean, default: false },
     suspended: { type: Boolean, default: false }
   }

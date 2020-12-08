@@ -86,7 +86,9 @@ client.on("ready", () => {
       judge: "726449337827196929",
       sponsor: "728226322433703986",
       verified: "745002844259614830",
-      winner: "746110403733618772"
+      winner: "746110403733618772",
+      snowman: "784508884151959552",
+      beta: "785958471249690694"
     };
     client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(user);
@@ -139,7 +141,9 @@ client.on("message", async (message) => {
       "mentor": "<:mentor:746348027136180284>",
       "judge": "<:judge:746347974275235973>",
       "host": "<:host:746348217465045072>",
-      "admin": "<:admin:746347769316376656>"
+      "admin": "<:admin:746347769316376656>",
+      "snowman": ":snowman:",
+      "beta": ":test_tube:"
     };
     message.channel.send(new Discord.MessageEmbed()
         .setAuthor(`${u.name} (@${u.username})`, u.avatar || "", `https://nchack.org/profile/${u.username}`)
