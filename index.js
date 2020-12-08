@@ -57,44 +57,27 @@ const client = new Discord.Client();
 client.login(process.env.DISCORD_AUTH_TOKEN);
 client.on("ready", () => {
   signale.success(`${client.user.tag} Started`);
-  const router = express.Router();
-  const botApp = express();
-  botApp.use("/", router);
-  botApp.use(bodyParser.urlencoded({ extended: false }));
-  botApp.use(bodyParser.json());
-  botApp.listen(8443, () => signale.success(`Bot Client Listening on Port 8443`));
-  router.post("/user/:user/connect", (req, res) => {
-    console.log(req.headers.authorization);
-    if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
-    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
-    let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
-    if (member) {
-      signale.success("Member role time")
-      member.roles.add("737326939546583052", "Connected account");
-    }
-    res.sendStatus(200);
-  });
-  router.post("/user/:user/disconnect", (req, res) => {
-    signale.success("Disconnect received")
-    if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
-    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
-    let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
-    if (member) {
-      signale.success("Member role rm time")
-      member.roles.remove("737326939546583052", "Disconnected account");
-    }
-    res.sendStatus(200);
-  });
-  router.post("/user/:user/participant", (req, res) => {
-    if (!req.headers.authorization || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
-    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
-    let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
+
+  global.discord = { client: client };
+  global.discord.connect = function(user) {
+    client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
+    let member = client.guilds.cache.get("726440966327631933").members.cache.get(user);
+    if (member) member.roles.add("737326939546583052", "Connected account");
+    return true;
+  };
+  global.discord.disconnect = function(user) {
+    client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
+    let member = client.guilds.cache.get("726440966327631933").members.cache.get(user);
+    if (member) member.roles.remove("737326939546583052", "Disconnected account");
+    return true;
+  };
+  global.discord.participant = function(user) {
+    client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
+    let member = client.guilds.cache.get("726440966327631933").members.cache.get(user);
     if (member) member.roles.add("737327030022176818", "Participant");
-    res.sendStatus(200);
-  });
-  router.post("/user/:user/roles", (req, res) => {
-    if (!req.headers.authorization || !req.headers.flags || req.headers.authorization !== process.env.DISCORD_AUTH_TOKEN) return res.sendStatus(403);
-    let flags = JSON.parse(req.headers.flags);
+    return true;
+  };
+  global.discord.roles = function(user, flags) {
     let flagsToRoles = {
       admin: "726441017355534417",
       organizer: "726442065226891296",
@@ -105,16 +88,16 @@ client.on("ready", () => {
       verified: "745002844259614830",
       winner: "746110403733618772"
     };
-    client.guilds.cache.get("726440966327631933").members.fetch(req.params.user).catch(e => console.log("Could not fetch a member"));
-    let member = client.guilds.cache.get("726440966327631933").members.cache.get(req.params.user);
+    client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
+    let member = client.guilds.cache.get("726440966327631933").members.cache.get(ruser);
     if (member) {
       Object.keys(flagsToRoles).forEach(f => {
         if (flagsToRoles[f] && flags[f] && !member.roles.cache.has(flagsToRoles[f])) member.roles.add(flagsToRoles[f]);
         else if (flagsToRoles[f] && !flags[f] && member.roles.cache.has(flagsToRoles[f])) member.roles.remove(flagsToRoles[f]);
       });
     }
-    res.sendStatus(200);
-  });
+    return true;
+  };
 });
 
 client.on("message", async (message) => {

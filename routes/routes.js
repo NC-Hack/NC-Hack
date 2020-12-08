@@ -233,14 +233,9 @@ module.exports = (app, passport) => {
               }
             });
             if (addReq.status === 204) {
-              axios.post(`https://nchack.org:8443/user/${user.discord_id}/connect`, {}, { headers: {
-                "Authorization": process.env.DISCORD_AUTH_TOKEN
-                } }).then(a => console.log(a));
+              global.discord.connect(user.discord_id);
             }
-            axios.post(`https://nchack.org:8443/user/${user.discord_id}/roles`, {}, { headers: {
-                "Authorization": process.env.DISCORD_AUTH_TOKEN,
-                flags: JSON.stringify(user.flags)
-              } });
+            global.discord.roles(user.discord_id, user.flags);
             res.status(200).redirect("/connectdiscord");
           })
           .catch(function (error) {
@@ -310,9 +305,7 @@ module.exports = (app, passport) => {
     if (!req.user) return res.redirect("/403");
     UserModel.findOne({ token: req.user.token }, async (err, user) => {
       if (!user || !user.discord_token) return res.redirect("/403");
-      axios.post(`https://nchack.org:8443/user/${user.discord_id}/disconnect`, {}, { headers: {
-          "Authorization": process.env.DISCORD_AUTH_TOKEN
-        } });
+      global.discord.disconnect(user.discord_id);
       user.discord_token = null;
       user.discord_id = null;
       await user.save();
@@ -580,9 +573,7 @@ module.exports = (app, passport) => {
             s.save();
         }
 
-      if (req.user.discord_id) axios.post(`https://nchack.org:8443/user/${req.user.discord_id}/participant`, {}, { headers: {
-          "Authorization": process.env.DISCORD_AUTH_TOKEN
-        } });
+      if (req.user.discord_id) global.discord.participant(req.user.discord_id);
 
       res.redirect(`/challenge/${i._id}`);
     });
@@ -618,19 +609,13 @@ module.exports = (app, passport) => {
           teamMembers.forEach(m => {
             m.flags.winner = true;
             m.save();
-            if (m.discord_id) axios.post(`https://nchack.org:8443/user/${m.discord_id}/roles`, {}, { headers: {
-                "Authorization": process.env.DISCORD_AUTH_TOKEN,
-                flags: JSON.stringify(m.flags)
-              } });
+            if (m.discord_id) global.discord.roles(m.discord_id, m.flags);
           })
         } else {
           let user = await UserModel.findOne({ _id: s.author });
           if (user) {
             user.save();
-            if (user.discord_id) axios.post(`https://nchack.org:8443/user/${user.discord_id}/roles`, {}, { headers: {
-                "Authorization": process.env.DISCORD_AUTH_TOKEN,
-                flags: JSON.stringify(user.flags)
-              } });
+            if (user.discord_id) global.discord.roles(user.discord_id, user.flags);
           }
         }
       }
@@ -905,10 +890,7 @@ module.exports = (app, passport) => {
       }
 
       user.save();
-      if (user.discord_id) axios.post(`https://nchack.org:8443/user/${user.discord_id}/roles`, {}, { headers: {
-          "Authorization": process.env.DISCORD_AUTH_TOKEN,
-          flags: JSON.stringify(user.flags)
-        } });
+      if (user.discord_id) global.discord.roles(user.discord_id, user.flags);
       res.status(200).redirect(`/profile/${user.username}`);
     });
   });
