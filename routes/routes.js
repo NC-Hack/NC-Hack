@@ -105,6 +105,11 @@ module.exports = (app, passport) => {
     });
   });
 
+  app.get("/snowman", (req, res) => res.render("snowman", {
+    isAuth: req.isAuthenticated(),
+    user: req.user
+  }));
+
   app.get("/github", (req, res) => {
     if (!req.user) return res.redirect("/403");
     UserModel.findOne({token: req.user.token}, async (err, user) => {
