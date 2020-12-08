@@ -14,6 +14,9 @@ const axios = require("axios");
 module.exports = (app, passport) => {
   require('dotenv').config();
   // -- PUBLIC --
+  app.post("/user/:user/connect", (req, res) => {
+    console.log("It's going to the reg app")
+  });
   // Home Page
   app.get("/", (req, res) => res.render("home", {
     isAuth: req.isAuthenticated(),
