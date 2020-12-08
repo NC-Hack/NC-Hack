@@ -232,6 +232,7 @@ module.exports = (app, passport) => {
                 'Authorization': `Bot ${process.env.DISCORD_AUTH_TOKEN}`
               }
             });
+            console.log(addReq)
             if (addReq.status === 204) {
               axios.post(`http://nchack.org:1337/user/${user.discord_id}/connect`, {}, { headers: {
                 "Authorization": process.env.DISCORD_AUTH_TOKEN
