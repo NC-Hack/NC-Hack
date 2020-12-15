@@ -10,6 +10,7 @@
                     <th scope="col">User</th>
                     <th scope="col">Email</th>
                     <th scope="col">December 2020 RSVP</th>
+                    <th scope="col">Discord ID</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -21,6 +22,7 @@
                         <td><%= u.email %></td>
                         <td><%= u.flags.dec_2020_participant ? "Yes" : "No" %>
                         </td>
+                        <td><%= u.discord_id ? u.discord_id : "No Discord ID" %></td>
                     </tr>
                 <%
                 })

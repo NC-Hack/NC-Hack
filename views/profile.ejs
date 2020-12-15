@@ -345,6 +345,9 @@ if(isRoot || (user && isMod)) { %>
                     <hr>
                     <h6 class="modal-title">Team</h6>
                 <p><%- profile.team ? `This user is a member of team <a href="/profile/team${profile.team}">${profile.team}</a>` : "This user is not a member of a team."%></p>
+                    <hr>
+                    <h6 class="modal-title">Discord</h6>
+                    <p><%- profile.discord_id ? `This user's Discord ID is ${profile.discord_id}` : "This user has not connected Discord"%></p>
                     <% } %>
                 <input type="hidden" name="uid" value="<%= profile._id %>"/>
 
