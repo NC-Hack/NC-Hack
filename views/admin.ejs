@@ -14,7 +14,7 @@
                 </thead>
                 <tbody>
                 <%
-                users.forEach(u => {
+                users.filter(u => !u.flags.team).forEach(u => {
                 %>
                     <tr>
                         <td><a href="/profile/<%= u.username %>"><%= u.name %> (@<%= u.username %>)</a></td>
