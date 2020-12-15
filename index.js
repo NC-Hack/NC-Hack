@@ -125,8 +125,8 @@ client.on("message", async (message) => {
             });
       }
 
-      user = client.users.cache.get(userMatch)
-          || fetchUnknownUser(userMatch)
+      user = client.users.cache.get(userMatch[1])
+          || fetchUnknownUser(userMatch[1])
           || null;
     }
     if (!user || !user.id) return message.channel.send(":x: Invalid user");
