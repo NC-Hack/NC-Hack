@@ -336,6 +336,12 @@ if(isRoot || (user && isMod)) { %>
                         Exempt From Email Verification
                     </label>
                 </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="form-flag-dec_2020_participant" value="true" <%= flags.includes("dec_2020_participant") ? "checked" : "" %>>
+                        <label class="form-check-label" for="form-flag-dec_2020_participant">
+                            December 2020 RSVP
+                        </label>
+                    </div>
                     <hr>
                     <h6 class="modal-title">Team</h6>
                 <p><%- profile.team ? `This user is a member of team <a href="/profile/team${profile.team}">${profile.team}</a>` : "This user is not a member of a team."%></p>

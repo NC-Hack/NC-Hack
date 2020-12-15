@@ -1,0 +1,34 @@
+<%- include('components/header') %>
+<div class="m-3">
+    <div class="container text-center shadow p-3 rounded" style="width: 50%;">
+        <div style="width:auto;">
+            <h1>Administrative Information</h1>
+            <p>There are <%= users.filter(u => u.flags.dec_2020_participant).length %> users signed up for the December 2020 event.</p>
+            <table class="table table-striped">
+                <thead class="thead-light">
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">December 2020 RSVP</th>
+                </tr>
+                </thead>
+                <tbody>
+                <%
+                users.forEach(u => {
+                %>
+                    <tr>
+                        <td><a href="/profile/<%= u.username %>"><%= u.name %> (@<%= u.username %>)</a></td>
+                        <td><%= u.email %></td>
+                        <td><%= u.flags.dec_2020_participant ? "Yes" : "No" %>
+                        </td>
+                    </tr>
+                <%
+                })
+                %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<%- include('components/footer') %>

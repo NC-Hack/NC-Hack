@@ -105,6 +105,28 @@ module.exports = (app, passport) => {
     });
   });
 
+  app.get("/rsvp", (req, res) => {
+    if (!req.user) return res.redirect("/403");
+      res.render("rsvp", {
+        isAuth: req.isAuthenticated(),
+        user: req.user
+      });
+  });
+
+  app.get("/admin", (req, res) => {
+    if (!req.user) return res.redirect("/403");
+    UserModel.findOne({_id: req.user._id}, async (err, user) => {
+      if (!user || user.token !== req.user.token || !user.flags.admin) return res.redirect("/403");
+      UserModel.find({}, async (err, all) => {
+        res.render("admin", {
+          isAuth: req.isAuthenticated(),
+          user: req.user,
+          users: all
+        });
+      });
+    });
+  });
+
   app.get("/snowman", (req, res) => res.render("snowman", {
     isAuth: req.isAuthenticated(),
     user: req.user
@@ -544,6 +566,18 @@ module.exports = (app, passport) => {
         judges: judgeObj,
         submissions: subArr
       });
+    });
+  });
+
+  app.post("/api/rsvp", async (req, res) => {
+    if (!req.user) return res.sendStatus(400);
+    UserModel.findOne({ _id: req.user._id }, async (err, u) => {
+      if (err) throw err;
+      if (!u) return res.sendStatus(400);
+      if (req.user.token !== req.user.token) return res.sendStatus(403);
+      u.flags.dec_2020_participant = !u.flags.dec_2020_participant;
+      u.save();
+      res.redirect("/rsvp");
     });
   });
 
