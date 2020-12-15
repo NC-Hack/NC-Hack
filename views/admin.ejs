@@ -3,7 +3,7 @@
     <div class="container text-center shadow p-3 rounded" style="width: 50%;">
         <div style="width:auto;">
             <h1>Administrative Information</h1>
-            <p>There are <%= users.filter(u => u.flags.dec_2020_participant).length %> users signed up for the December 2020 event.</p>
+            <p>There are <%= users.filter(u => !u.flags.team).length %> users (as well as <%= users.filter(u => u.flags.team).length %> team users)<br>There are <%= users.filter(u => u.flags.dec_2020_participant).length %> users signed up for the December 2020 event.</p>
             <table class="table table-striped">
                 <thead class="thead-light">
                 <tr>

@@ -106,7 +106,7 @@ module.exports = (app, passport) => {
   });
 
   app.get("/rsvp", (req, res) => {
-    if (!req.user) return res.redirect("/403");
+    if (!req.user) return res.redirect("/login");
       res.render("rsvp", {
         isAuth: req.isAuthenticated(),
         user: req.user
