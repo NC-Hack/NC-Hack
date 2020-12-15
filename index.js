@@ -129,7 +129,8 @@ client.on("message", async (message) => {
           || fetchUnknownUser(userMatch)
           || null;
     }
-    if (!user) return message.channel.send(":x: Invalid user");
+    if (!user || !user.id) return message.channel.send(":x: Invalid user");
+    console.log(user.id);
     let u = await UserModel.findOne({ discord_id: user.id });
     console.log(u);
     if (!u || !u.discord_id) return message.channel.send(":x: No connected NC Hack account");
