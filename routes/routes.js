@@ -575,7 +575,7 @@ module.exports = (app, passport) => {
       if (err) throw err;
       if (!u) return res.sendStatus(400);
       if (req.user.token !== req.user.token) return res.sendStatus(403);
-      u.flags.dec_2020_participant = !u.flags.dec_2020_participant;
+      u.flags.mar_2021_participant = !u.flags.mar_2021_participant;
       u.save();
       res.redirect("/rsvp");
     });

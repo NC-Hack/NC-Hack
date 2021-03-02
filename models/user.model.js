@@ -30,7 +30,7 @@ let userSchema = new Schema({
     beta: { type: Boolean, default: false },
     no_edit: { type: Boolean, default: false },
     suspended: { type: Boolean, default: false },
-    dec_2020_participant: { type: Boolean, default: false }
+    mar_2021_participant: { type: Boolean, default: false }
   }
 });
 

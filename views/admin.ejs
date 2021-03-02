@@ -3,13 +3,13 @@
     <div class="container text-center shadow p-3 rounded" style="width: 50%;">
         <div style="width:auto;">
             <h1>Administrative Information</h1>
-            <p>There are <%= users.filter(u => !u.flags.team).length %> users (as well as <%= users.filter(u => u.flags.team).length %> team users)<br>There are <%= users.filter(u => u.flags.dec_2020_participant).length %> users signed up for the December 2020 event.</p>
+            <p>There are <%= users.filter(u => !u.flags.team).length %> users (as well as <%= users.filter(u => u.flags.team).length %> team users)<br>There are <%= users.filter(u => u.flags.mar_2021_participant).length %> users signed up for the March 2021 event.</p>
             <table class="table table-striped">
                 <thead class="thead-light">
                 <tr>
                     <th scope="col">User</th>
                     <th scope="col">Email</th>
-                    <th scope="col">December 2020 RSVP</th>
+                    <th scope="col">March 2021 RSVP</th>
                     <th scope="col">Discord ID</th>
                 </tr>
                 </thead>
@@ -20,7 +20,7 @@
                     <tr>
                         <td><a href="/profile/<%= u.username %>"><%= u.name %> (@<%= u.username %>)</a></td>
                         <td><%= u.email %></td>
-                        <td><%= u.flags.dec_2020_participant ? "Yes" : "No" %>
+                        <td><%= u.flags.mar_2021_participant ? "Yes" : "No" %>
                         </td>
                         <td><%= u.discord_id ? u.discord_id : "No Discord ID" %></td>
                     </tr>

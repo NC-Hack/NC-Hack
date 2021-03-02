@@ -3,10 +3,10 @@
     <div class="container text-center shadow p-3 rounded" style="width: 50%;">
         <div style="width:auto;">
             <% if (user.flags.participant) { %>
-            <h1>RSVP for NC Hack: December 2020</h1>
-            <p>Click the button below to <%= user.flags.dec_2020_participant ? "cancel your RSVP" : "RSVP for the event" %>! This allows us to get a headcount of who is participating in the event.</p>
+            <h1>RSVP for NC Hack: March 2021</h1>
+            <p>Click the button below to <%= user.flags.mar_2021_participant ? "cancel your RSVP" : "RSVP for the event" %>! This allows us to get a headcount of who is participating in the event.</p>
             <form action="/api/rsvp" method="post" id="form">
-                <button action="submit" class="m-2 btn btn-<%= user.flags.dec_2020_participant ? "danger" : "primary" %>" onclick="location.href='/';"><%= user.flags.dec_2020_participant ? "Cancel RSVP" : "RSVP for NC Hack: December 2020"%></button>
+                <button action="submit" class="m-2 btn btn-<%= user.flags.mar_2021_participant ? "danger" : "primary" %>" onclick="location.href='/';"><%= user.flags.mar_2021_participant ? "Cancel RSVP" : "RSVP for NC Hack: March 2021"%></button>
             </form>
             <% } else {  %>
                 <p>You are not allowed to RSVP due to a loss of participant privileges.</p>
