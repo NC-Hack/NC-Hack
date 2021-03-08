@@ -286,8 +286,7 @@ if(isMod) { %>
         let eventsOnDay = sortedEvents[k].filter(e => new Date(e.end.getTime()) < Date.now() && (e.hidden ? isMod : true)).sort((a, b) => a.start - b.start);
     if (eventsOnDay.length > 0) {
     %>
-    <div style="min-height: 500px;">
-        
+
     </div>
         <div class="row row-striped">
             <div class="col-2 text-right">
