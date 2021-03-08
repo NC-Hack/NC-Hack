@@ -134,7 +134,7 @@ module.exports = (app, passport) => {
 
   app.get("/github", (req, res) => {
     if (!req.user) return res.redirect("/403");
-    UserModel.findOne({token: req.user.token}, async (err, user) => {
+    UserModel.findOne({"_id": req.user._id}, async (err, user) => {
       if (!user) return res.redirect("/403");
 
       let repos = null;
@@ -172,7 +172,7 @@ module.exports = (app, passport) => {
 
   app.get("/api/github/auth", (req, res) => {
     if (!req.user) return res.redirect("/403");
-    UserModel.findOne({token: req.user.token}, async (err, user) => {
+    UserModel.findOne({"_id": req.user._id}, async (err, user) => {
       if (!user) return res.redirect("/403");
       axios.post('https://github.com/login/oauth/access_token', {
         client_id: process.env.GH_CLIENT_ID,
@@ -194,7 +194,7 @@ module.exports = (app, passport) => {
 
   app.get("/connectdiscord", (req, res) => {
     if (!req.user) return res.redirect("/403");
-    UserModel.findOne({token: req.user.token}, async (err, user) => {
+    UserModel.findOne({"_id": req.user._id}, async (err, user) => {
       if (!user) return res.redirect("/403");
 
       let discordInfo = {
@@ -229,7 +229,7 @@ module.exports = (app, passport) => {
 
   app.get("/api/discord/auth", (req, res) => {
     if (!req.user) return res.redirect("/403");
-    UserModel.findOne({token: req.user.token}, async (err, user) => {
+    UserModel.findOne({"_id": req.user._id}, async (err, user) => {
       if (!user) return res.redirect("/403");
       let postData = {
         client_id: process.env.DISCORD_AUTH_ID,
@@ -508,7 +508,7 @@ module.exports = (app, passport) => {
       }
 
       if (req.user) {
-        let submission = await SubmissionModel.findOne({ $or: [{ author: req.user._id }, { team: req.user.team }], challenge: req.params.challenge });
+        let submission = await SubmissionModel.findOne({ challenge: req.params.challenge, $or: [{ author: req.user._id }, { team: req.user.team || "notavalidteamvalue" }] });
         if (submission) preSub = submission;
       }
 
