@@ -74,7 +74,7 @@ client.on("ready", () => {
   global.discord.participant = function(user) {
     client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(user);
-    if (member) member.roles.add("737327030022176818", "Participant");
+    if (member) member.roles.add("821094030204731452", "Participant");
     return true;
   };
   global.discord.roles = function(user, flags) {
@@ -86,9 +86,7 @@ client.on("ready", () => {
       judge: "726449337827196929",
       sponsor: "728226322433703986",
       verified: "745002844259614830",
-      winner: "746110403733618772",
-      snowman: "784508884151959552",
-      beta: "785958471249690694"
+      winner: "821094247344242758"
     };
     client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(user);
