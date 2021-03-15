@@ -822,17 +822,17 @@ module.exports = (app, passport) => {
       user.save();
       const transport = mailer.createTransport(
           smtp({
-            host: 'smtp.sendgrid.net',
+            host: 'smtp.gmail.com',
             port: 465,
             auth: {
-              user: "apikey",
-              pass: process.env.SENDGRID_KEY,
+              user: "team@nchack.org",
+              pass: process.env.GMAIL_PASS,
             },
           })
       );
 
       let message = {
-        from: '"NC Hack" no-reply@nchack.org',
+        from: '"NC Hack" team@nchack.org',
         to: `"${user.name}" ${user.email}`,
         subject: "Your account password was reset",
         text: "**********************************\n" +
@@ -877,11 +877,11 @@ module.exports = (app, passport) => {
           user.emailValidated = false;
           const transport = mailer.createTransport(
               smtp({
-                host: 'smtp.sendgrid.net',
+                host: 'smtp.gmail.com',
                 port: 465,
                 auth: {
-                  user: "apikey",
-                  pass: process.env.SENDGRID_KEY,
+                  user: "team@nchack.org",
+                  pass: process.env.GMAIL_PASS,
                 },
               })
           );
@@ -895,7 +895,7 @@ module.exports = (app, passport) => {
           let link = `https://nchack.org/api/verify/${token}`;
 
           let message = {
-            from: '"NC Hack" no-reply@nchack.org',
+            from: '"NC Hack" team@nchack.org',
             to: `"${user.name}" ${user.email}`,
             subject: "Verify your new email!",
             text: "**********************************\n" +
@@ -1166,17 +1166,17 @@ module.exports = (app, passport) => {
 
     const transport = mailer.createTransport(
         smtp({
-          host: 'smtp.sendgrid.net',
+          host: 'smtp.gmail.com',
           port: 465,
           auth: {
-            user: "apikey",
-            pass: process.env.SENDGRID_KEY,
+            user: "team@nchack.org",
+            pass: process.env.GMAIL_PASS,
           },
         })
     );
 
     let message = {
-      from: '"NC Hack" no-reply@nchack.org',
+      from: '"NC Hack" team@nchack.org',
       to: `"${req.user.name}" ${req.user.email}`,
       subject: "Verify your account!",
       text: "**********************************\n" +
