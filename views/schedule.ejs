@@ -263,7 +263,7 @@ if(isMod) { %>
                 <h2><%= matchDate(k).toLocaleString('default', { month: 'short' }).toUpperCase() %></h2>
             </div>
             <div class="col-10">
-                <% eventsOnDay.sort((a, b) => b.start - a.start).forEach(e => { %>
+                <% eventsOnDay.sort((a, b) => a.start - b.start).forEach(e => { %>
                 <h3 class="text-uppercase"><strong><%= e.title %></strong></h3>
                 <ul class="list-inline">
                     <% if (Date.now() > new Date(e.start)) { %><li class="list-inline-item"><span style="color:red"><i class="material-icons">priority_high</i> Happening Now!</span> Ends at <span class="created"><%= e.end %></span></li><% } else { %>
