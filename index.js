@@ -151,5 +151,5 @@ client.on("message", async (message) => {
 });
 
 client.on("guildMemberAdd", (member) => {
-  member.guild.channels.cache.get("726447330391490650").send(`Welcome <@${member.id}> to **${message.guild.name}**!\n>>> You can check out our website at https://nchack.org/. See the instructions in <#738874922675208278> to connect your Discord account to our site.\nThe next hackathon is set for __March 20th__, make sure to RSVP at https://nchack.org/rsvp\nIf you have any questions, let us know in <#726445290282024971>.`);
+  member.guild.channels.cache.get("726447330391490650").send(`Welcome <@${member.id}> to **${member.guild.name}**!\n>>> You can check out our website at https://nchack.org/. See the instructions in <#738874922675208278> to connect your Discord account to our site.\nThe next hackathon is set for __March 20th__, make sure to RSVP at https://nchack.org/rsvp\nIf you have any questions, let us know in <#726445290282024971>.`);
 });
