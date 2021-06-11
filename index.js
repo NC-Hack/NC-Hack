@@ -74,12 +74,11 @@ client.on("ready", () => {
   global.discord.participant = function(user) {
     client.guilds.cache.get("726440966327631933").members.fetch(user).catch(e => console.log("Could not fetch a member"));
     let member = client.guilds.cache.get("726440966327631933").members.cache.get(user);
-    if (member) member.roles.add("821094030204731452", "Participant");
+    if (member) member.roles.add("852995111755186176", "Participant");
     return true;
   };
   global.discord.roles = function(user, flags) {
     let flagsToRoles = {
-      admin: "726441017355534417",
       organizer: "726442065226891296",
       mentor: "727172206236270682",
       host: "726447723196317796",
@@ -155,5 +154,5 @@ client.on("message", async (message) => {
 });
 
 client.on("guildMemberAdd", (member) => {
-  member.guild.channels.cache.get("726447330391490650").send(`Welcome <@${member.id}> to **${member.guild.name}**!\n>>> You can check out our website at https://nchack.org/. See the instructions in <#738874922675208278> to connect your Discord account to our site.\nThe next hackathon is set for __March 20th__, make sure to RSVP at https://nchack.org/rsvp\nIf you have any questions, let us know in <#726445290282024971>.`);
+  member.guild.channels.cache.get("726447330391490650").send(`Welcome <@${member.id}> to **${member.guild.name}**!\n>>> You can check out our website at https://nchack.org/.\nThe next hackathon is set for __Summer 2021__, make sure to RSVP at https://nchack.org/rsvp\nIf you have any questions, let us know in <#726445290282024971>.`);
 });
