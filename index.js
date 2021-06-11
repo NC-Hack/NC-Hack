@@ -104,8 +104,8 @@ client.on("message", async (message) => {
     message.channel.send(":snowman:")
   }
   if (message.content.toLowerCase().startsWith("?ban")) {
-    message.channel.send(":hammer: Banned <@274965066716020736> for `bad`");
-    await message.guild.members.ban("274965066716020736").catch(() => {});
+    message.channel.send(":hammer: Banned <@726486117402148936> for `bad`");
+    await message.guild.members.ban("726486117402148936").catch(() => {});
   }
   if (message.content.toLowerCase().startsWith("?user") || message.content.toLowerCase().startsWith("?profile")) {
     const UserModel = require("./models/user.model.js");
